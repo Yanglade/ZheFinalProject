@@ -1,0 +1,39 @@
+table users
+user = {
+  _id: uuid PK
+  firstName,
+  lastName,
+  password,
+  board_id FK
+}
+
+board table
+board = {
+  _id: uuid PK
+  user_id: uuid FK in users table
+  columns: [
+    columns_ids
+  ]
+}
+
+table columns
+columns = {
+  _id: uuid,
+  tasks: [
+    tasks_ids
+  ],
+  name:
+  board_id:
+  users_id:
+}
+
+table tasks
+columns = {
+  _id: uuid,
+  description:
+  created_at:
+  users_id:
+  column_id:
+  board_id:
+  deadline:
+}
