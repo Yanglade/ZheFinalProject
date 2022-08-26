@@ -3,19 +3,23 @@ import styled from "styled-components";
 import {Droppable, Draggable} from "react-beautiful-dnd";
 import Task from "./Task";
 
-const Column = ({column, tasks, isDropDisabled, index}) => {
+const Column = ({column, tasks, isDropDisabled, index, state, setState}) => {
 
-  const InnerList = ({tasks}) => {
-    return (
-      tasks.map((task, index) => <Task key={task.id} task={task} index={index} />)
-    )
-  }
-
-  const MemoInnerList = memo(InnerList);
-
-  // const addTask = () => {
-  //   tasks.push()
+  // const InnerList = ({tasks}) => {
+  //   return (
+  //     tasks.map((task, index) => <Task key={task.id} task={task} index={index} />)
+  //   )
   // }
+
+  // const MemoInnerList = memo(InnerList);
+
+  const addTask = () => {
+    console.log("in add task");
+    const newTaskId = `task-${Object.keys(state.tasks).length+1}`;
+    const newTask = {id: newTaskId, content: newTaskId};
+
+    setState({...state, tasks: {...state.tasks, [newTaskId]: newTask }, columns: {...state.columns, [column.id]: {...column, taskIds: [...column.taskIds, newTaskId]}}});
+  }
 
    return (
     <Draggable draggableId={column.id} index={index}>
@@ -39,13 +43,13 @@ const Column = ({column, tasks, isDropDisabled, index}) => {
                 {...provided.droppableProps}
                 isDraggingOver = {snapshot.isDraggingOver}
               > 
-                  {/* {tasks.map((task, index) => <Task key={task.id} task={task} index={index} />)} //YA */}
-                  <MemoInnerList tasks={tasks}/>
+                  {tasks.map((task, index) => <Task key={task.id} task={task} index={index} />)} 
+                  {/* <MemoInnerList tasks={tasks}/> */}
                   {provided.placeholder}
               </TaskList>
             )}
           </Droppable>
-          <AddTaskButton /*onClick={addTask}*/>Add a task</AddTaskButton>
+          <AddTaskButton onClick={addTask}>Add a task</AddTaskButton>
         </Container>
       )}
     </Draggable>
@@ -83,4 +87,10 @@ const AddTaskButton = styled.button`
   margin: 5px;
   box-sizing: border-box;
   align-self: center;
+  border: none;
+  background-color: inherit;
+  color: grey;
+  &:hover {
+    background-color: lightgrey;
+  }
 `;

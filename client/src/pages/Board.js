@@ -8,6 +8,7 @@ import Header from "../components/Header";
 const Board = () => {
   // const state = initialData;
   const [state, setState] = useState(initialData);
+  
 
   // const onDragStart = () => {
   //   document.body.style.color = "orange";
@@ -122,10 +123,19 @@ const Board = () => {
     setState(newState);
   };
 
+  const addColumn = () => {
+    console.log("in add column");
+    const newColumnId = `column-${Object.keys(state.columnOrder).length+1}`;
+    const newColumn = {id: newColumnId, title: newColumnId, taskIds: []};
+
+    setState({...state, columns: {...state.columns, [newColumn.id]: newColumn}, columnOrder: [...state.columnOrder, newColumn.id]});
+  }
+
   console.log("in DragDrop", state.columnOrder);
   return (
     <>
       <Header/>
+      <BoardArea>
       <DragDropContext
         // onDragStart={onDragStart}
         // onDragUpdate={onDragUpdate}
@@ -149,7 +159,7 @@ const Board = () => {
                     taskId => state.tasks[taskId]
                   );
                     const isDropDisabled = false;  //index < state.homeIndex; //disable going backwards
-                    return <Column key={column.id} column={column} tasks={tasks} isDropDisabled={isDropDisabled} index={index}/>
+                    return <Column key={column.id} column={column} tasks={tasks} isDropDisabled={isDropDisabled} index={index} state={state} setState={setState}/>
                   })
               }
               {provided.placeholder}
@@ -157,14 +167,25 @@ const Board = () => {
           )}
         </Droppable>
       </DragDropContext>
-
+      <AddColumnButton onClick={addColumn}> Add Column</AddColumnButton>
+      </BoardArea>
     </>
 
   )
 };
 
+const BoardArea = styled.div`
+  display: flex;
+`;
+
 const Container = styled.div`
   display:flex;
 `;
+
+const AddColumnButton = styled.button`
+  height: 40px;
+  width: 100px;
+  margin: 10px;
+`
 
 export default Board;
