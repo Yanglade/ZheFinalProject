@@ -1,13 +1,25 @@
-import React, {useState} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import styled from "styled-components";
 import initialData from "../data/initial-data";
 import Column from "../components/Column";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import Header from "../components/Header";
+import { Dialog, DialogOverlay, DialogContent } from "@reach/dialog";
+import { usePersistedState } from "../hooks/usePersistedState";
+import "@reach/dialog/styles.css";
 
 const Board = () => {
   // const state = initialData;
-  const [state, setState] = useState(initialData);
+  // const [state, setState] = useState(initialData);
+  const [state, setState] = usePersistedState(initialData, "board");
+  const [showDialog, setShowDialog] = React.useState(false);
+  const open = () => setShowDialog(true);
+  const close = () => setShowDialog(false);
+  const dialogButtonRef = useRef();
+
+  useEffect(() => {
+      console.log(`state = `, state);
+  }, [state]);
   
 
   // const onDragStart = () => {
@@ -129,6 +141,7 @@ const Board = () => {
     const newColumn = {id: newColumnId, title: newColumnId, taskIds: []};
 
     setState({...state, columns: {...state.columns, [newColumn.id]: newColumn}, columnOrder: [...state.columnOrder, newColumn.id]});
+    open();
   }
 
   console.log("in DragDrop", state.columnOrder);
@@ -167,7 +180,15 @@ const Board = () => {
           )}
         </Droppable>
       </DragDropContext>
+      <div>
       <AddColumnButton onClick={addColumn}> Add Column</AddColumnButton>
+        <Dialog aria-label="Adding a column" style={{ color: "black", width: "120px",border: "solid 3px hsla(0, 0%, 0%, 0.5)" }} isOpen={showDialog} onDismiss={close} initialFocusRef={dialogButtonRef}>
+          <div style={{width: "95%", display:"flex", flexDirection:"column", justifyContent:"space-between"}}>
+            <input type="text" placeholder="Column Name" />
+            <button style={{margin:"10px 0px"}} onClick={close}>Close</button>
+          </div>
+        </Dialog>
+      </div>
       </BoardArea>
     </>
 
