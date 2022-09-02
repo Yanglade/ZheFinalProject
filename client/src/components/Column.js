@@ -10,6 +10,7 @@ const [showDialog, setShowDialog] = React.useState(false);
 const open = () => setShowDialog(true);
 const close = () => setShowDialog(false);
 const addTaskBtnRef = useRef();
+const columnNameRef = useRef();
 
   // const InnerList = ({tasks}) => {
   //   return (
@@ -44,6 +45,29 @@ const addTaskBtnRef = useRef();
     addTaskBtnRef.current.focus();
   }
 
+  const onEnter = (e) => {
+    // e.preventDefault();
+    e.stopPropagation();
+    // alert(`e.target.value:${e.target.value === ""}...`);
+    //console.log(`e.target.value = `, e.target.value);
+    if (e.charCode === 13 && e.target.value !== "") {
+      setState({...state, columns:{...state.columns, [column.id]: {...column, named: true, title: e.target.value}}});
+    }
+    else if (e.charCode === 13) {
+      e.preventDefault();
+    }
+  }
+
+  const deleteNewColumn = (e) => {
+    e.preventDefault();
+    const newState = {...state};
+     delete state.columns[column.id];
+
+     newState.columnOrder = newState.columnOrder.filter(aColumn => aColumn != column.id); //aTask != task.id
+     console.log(`state = `, newState);
+     setState(newState);
+  }
+
    return (
     <>
     <Draggable draggableId={column.id} index={index}>
@@ -52,7 +76,24 @@ const addTaskBtnRef = useRef();
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
-          <Title {...provided.dragHandleProps}> {column.title}</Title>
+          {(column.named == undefined || !column.named ) ? (
+            <form style={{display:"flex", flexDirection:"column", margin:"8px"}} onSubmit={(e)=> e.preventDefault()}>
+            {/* <> */}
+              <input
+                ref={columnNameRef}
+                style={{ height: "40px", border:"none", paddingLeft:"5px"}}
+                placeholder="Enter column name..."
+                name="taskName"
+                onKeyPress={(e)=>onEnter(e)}
+                autoComplete="off"
+                autoFocus
+              />
+              <button style={{color:"grey", width:"15px", display:"flex", justifyContent:"center", marginTop:"5px"}} title="delete column" onClick={(e)=>deleteNewColumn(e)}>X</button>
+              {/* </> */}
+            </form>
+          ) : (
+         <>
+          <Title style={{/*border:"2px solid blue"*/}} {...provided.dragHandleProps}> {column.title}</Title>
           <Droppable 
             droppableId={column.id} 
             // type={column.id === 'column-3' ? 'done': 'active'}
@@ -75,7 +116,7 @@ const addTaskBtnRef = useRef();
           </Droppable>
           <div style={{alignSelf:"center", width:"100px"}}>
             <AddTaskButton onClick={addTask} ref={addTaskBtnRef} disabled={!allTasksAreNamed()}>Add a task</AddTaskButton>
-            <DialogOverlay
+            {/* <DialogOverlay
               style={{ background: "hsla(0, 100%, 100%, 0.5)", width: "80vw" }}
               isOpen={showDialog}
               onDismiss={close}
@@ -88,18 +129,20 @@ const addTaskBtnRef = useRef();
                         width: "20vw"
                       }}
               >
-                {/* <p>
+                <p>
                   The overlay styles are a white fade instead of the default black
                   fade.
-                </p> */}
+                </p>
                 <form>
                   <input placeholder="Task Name" type="text" name="taskName" required/>
                 </form>
 
                 <button style={{margin:"10px 0px"}} onClick={close}>Close</button>
               </DialogContent>
-            </DialogOverlay>
+            </DialogOverlay> */}
           </div>
+        </>
+       )}
         </Container>
 
       )}

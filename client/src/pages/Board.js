@@ -11,15 +11,15 @@ import "@reach/dialog/styles.css";
 const Board = () => {
   // const state = initialData;
   // const [state, setState] = useState(initialData);
-  const [state, setState] = usePersistedState(initialData, "board");
+  const [state, setState] = usePersistedState(initialData, "board-1");
   const [showDialog, setShowDialog] = React.useState(false);
   const open = () => setShowDialog(true);
   const close = () => setShowDialog(false);
   const dialogButtonRef = useRef();
 
-  useEffect(() => {
-      console.log(`state = `, state);
-  }, [state]);
+  // useEffect(() => {
+  //     console.log(`state = `, state);
+  // }, [state]);
   
 
   // const onDragStart = () => {
