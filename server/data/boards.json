@@ -1,0 +1,41 @@
+[
+  {
+    "_id": "1",
+    "userIdsWithAccess": ["1"],
+    "board":  {
+      "tasks": {
+        "task-1": {"id": "task-1", "content": "Take out garbage", "named": true, "details": {"image_url": null}},
+        "task-2": {"id": "task-2", "content": "Watch my favorite show", "named": true},
+        "task-3": {"id": "task-3", "content": "Charge my phone", "named": true},
+        "task-4": {"id": "task-4", "content": "Cook dinner", "named": true}
+      },
+    
+      "columns": {
+        "column-1": {
+          "id": "column-1",
+          "title": "To do",
+          "named": true,
+          "taskIds": ["task-1","task-2", "task-3", "task-4"]
+        },
+        "column-2": {
+          "id": "column-2",
+          "title": "Progress",
+          "named": true,
+          "taskIds": []
+        },
+        "column-3": {
+          "id": "column-3",
+          "title": "Done",
+          "named": true,
+          "taskIds": []
+        }
+      },
+      "columnOrder": ["column-1", "column-2", "column-3"]
+    }
+  },
+  {
+    "_id": "2",
+    "userIdsWithAccess": ["2"],
+    "board": {"tasks":{"task-1":{"id":"task-1","content":"Take","named":true,"details":{"image_url":null,"description":""}},"task-2":{"id":"task-2","content":"Watch","named":true,"details":{"description":"Watch what?\n\nAre you insisting or ...what"}},"task-3":{"id":"task-3","content":"Charge","named":true},"task-4":{"id":"task-4","content":"Cook","named":true},"task-5":{"id":"task-5","content":"New","details":{"image_url":"../../client/public/favicon.ico"},"named":true},"task-6":{"id":"task-6","content":"Dive with me","details":{"image_url":"../../client/public/favicon.ico","description":"This is may crazy description.\n\nDoes it work when I write it on multiple lines.\n\nOh well, we will see."},"named":true},"details":{"image_url":"../../client/public/favicon.ico","description":"Dive description bitch!"}},"columns":{"column-1":{"id":"column-1","title":"To do","named":true,"taskIds":["task-3","task-6"]},"column-2":{"id":"column-2","title":"Progress","named":true,"taskIds":["task-1","task-4","task-5"]},"column-3":{"id":"column-3","title":"Done","named":true,"taskIds":[]},"column-4":{"id":"column-4","title":"New column","taskIds":["task-2"],"named":true}},"columnOrder":["column-1","column-3","column-2","column-4"],"homeIndex":null}
+  }
+]
