@@ -1,0 +1,16 @@
+[
+  {
+    "firstName": "Yves",
+    "LastName": "Anglade",
+    "email": "ya@gmail.com",
+    "_id": "1",
+    "boards":["1"]
+  },
+  {
+    "firstName": "Deavon",
+    "LastName": "Dawkins",
+    "email":"dg@gmail.com",
+    "_id": "2",
+    "boards":["2"]
+  }
+]

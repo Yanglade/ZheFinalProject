@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
+import UserProvider from "./context/UserContext";
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));
 // root.render(
@@ -19,8 +20,9 @@ ReactDOM.render(
     clientId="x3drZaEn8agYYg49vHIm5G0JdmygY3QG"
     redirectUri={window.location.origin}
    >
-
+    {/* <UserProvider> */}
         <App />
+    {/* </UserProvider> */}
   </Auth0Provider>
   </React.StrictMode>,
   document.getElementById("root")

@@ -23,16 +23,16 @@ const App = () => {
         <button onClick={()=>loginWithRedirect()}>Login</button>
       </>
       : (
-    <BrowserRouter>
-      <Routes>
-        <Route exact path="/" element={<Board/>} />
-        <Route exact path="/dashboard" element={<Dashboard/>} />
-        <Route exact path="/treeview" element={<Treeview/>} />
-        <Route exact path="/inspirational" element={<Inspirational/>} />
-        <Route exact path="/calendar" element={<Calendar/>} />
-      </Routes>
-    </BrowserRouter>
-  )
+        <BrowserRouter>
+          <Routes>
+            <Route exact path="/" element={<Board/>} />
+            <Route exact path="/dashboard" element={<Dashboard/>} />
+            <Route exact path="/treeview" element={<Treeview/>} />
+            <Route exact path="/inspirational" element={<Inspirational/>} />
+            <Route exact path="/calendar" element={<Calendar/>} />
+          </Routes>
+        </BrowserRouter>
+      )
   )
 }
 
