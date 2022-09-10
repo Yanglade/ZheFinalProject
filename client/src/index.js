@@ -15,15 +15,15 @@ import UserProvider from "./context/UserContext";
 
 ReactDOM.render(
   <React.StrictMode>
-   <Auth0Provider 
-    domain="dev-qnlaia4l.us.auth0.com"
-    clientId="x3drZaEn8agYYg49vHIm5G0JdmygY3QG"
-    redirectUri={window.location.origin}
-   >
-    {/* <UserProvider> */}
-        <App />
-    {/* </UserProvider> */}
-  </Auth0Provider>
+    <Auth0Provider 
+      domain="dev-qnlaia4l.us.auth0.com"
+      clientId="x3drZaEn8agYYg49vHIm5G0JdmygY3QG"
+      redirectUri={window.location.origin}
+    >
+      <UserProvider>
+          <App />
+      </UserProvider>
+    </Auth0Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );

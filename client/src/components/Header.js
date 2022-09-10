@@ -1,21 +1,30 @@
-import React from "react";
+import React, {useContext} from "react";
 import styled from "styled-components";
 import {NavLink} from "react-router-dom";
 import {useAuth0} from "@auth0/auth0-react";
+import {UserContext} from "../context/UserContext";
 
 
 const Header = () => {  
 
   const {logout} = useAuth0();
+  const {state} = useContext(UserContext);
+
+  console.log(`state.............................. = `, state);
 
   return (
     <Wrapper>
-       <NavLink to="/">Board</NavLink>
+      <NavLink to="/">Home</NavLink>
+       <NavLink to="/board">Board</NavLink>
        <NavLink to="/treeview">Treeview</NavLink>
        <NavLink to="/inspirational">Inspirational</NavLink>
        <NavLink to="/calendar">Calendar</NavLink>
        {/* <NavLink to="/">Login</NavLink> */}
-       <LogoutButton onClick={()=>logout()}>Logout</LogoutButton>
+       <UserDiv>
+        <UserAvatar><img style={{height:"100%",width:"auto"}}src={state.picture}/></UserAvatar>
+        <LogoutButton onClick={()=>logout()}>Logout</LogoutButton>
+       </UserDiv>
+       
     </Wrapper>
   )
 }
@@ -31,6 +40,21 @@ const Wrapper = styled.div`
 const LogoutButton = styled.button`
   height: 30px;
   width: 60px;
-`
+`;
+
+const UserAvatar = styled.div`
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background-color: blue;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+`;
+
+const UserDiv = styled.div`
+  display: flex;
+`;
 
 export default Header;

@@ -49,16 +49,16 @@ const getUsers = async (req, res) => {
 
       if (usersArray.length > 0) {
 
-        return res.status(200).json({
+        res.status(200).json({
             status: 200,
             users: usersArray,
         });
       }
       else
-        return res.status(404).json({status:404, message:"There no user available"});
+        res.status(404).json({status:404, message:"There no user available"});
   }
   catch(err) {
-      return res.status(500).json({status:500, message: err.message});
+      res.status(500).json({status:500, message: err.message});
   }
   finally {
       client.close();
@@ -66,9 +66,9 @@ const getUsers = async (req, res) => {
 };
 
 /**********************************************************/
-/*  getUser: returns a user for a userId
+/*  getUserById: returns a user for a userId
 /**********************************************************/
-const getUser = async (req, res) => {
+const getUserById = async (req, res) => {
     const client = new MongoClient(MONGO_URI, options);
     const dbName = "finalProject";
 
@@ -103,6 +103,53 @@ const getUser = async (req, res) => {
         }
         else
             return res.status(404).json({status:404, _id, message:"There isno user available"});
+    }
+    catch(err) {
+        return res.status(500).json({status:500, message: err.message});
+    }
+    finally {
+        client.close();
+    }
+  };
+
+/**********************************************************/
+/*  getUserByEmail: returns a user for a userId
+/**********************************************************/
+const getUserByEmail = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const dbName = "finalProject";
+
+    const {email} = req.params;
+  
+    console.log("in get users....:", email);
+  
+    try {
+        // connect...
+        await client.connect();
+        // declare 'db'
+        const db = client.db(dbName);
+  
+        const collections = await db.listCollections().toArray();
+        const collectionExists = collections.some(c => c.name === "users");
+  
+        if (!collectionExists)
+            throw new Error('user collection does not exist');
+  
+      console.log("user", await db.collection("users").findOne({email}));   
+      
+      const result = await db.collection("users").findOne({email});
+  
+  
+        if (result) {
+  
+            return res.json({
+                status:200, 
+                email,
+                data: result,
+                });
+        }
+        else
+            return res.status(404).json({status:404, email, message:"There is no corresponding user available"});
     }
     catch(err) {
         return res.status(500).json({status:500, message: err.message});
@@ -203,9 +250,73 @@ const getBoard = async (req, res) => {
     }
 };
 
+/**********************************************************/
+/*  getBoard: returns a list of all boards
+/**********************************************************/
+const login = async (req, res) => { //login
+    // check if user exists
+    // if user exists return existing user
+    // is user odes not exist create a new user
+    const client = new MongoClient(MONGO_URI, options);
+    const dbName = "finalProject";
+
+    const body = req.body;
+
+    const {given_name: firstName, family_name: lastName, email, picture} = body;
+
+    console.log(`body = `, req.body);
+
+    try {
+        // connect...
+        await client.connect();
+        // declare 'db'
+        const db = client.db(dbName);
+
+        const collections = await db.listCollections().toArray();
+        const collectionExists = collections.some(c => c.name === "users");
+
+        if (body && body.email && body.given_name && body.family_name && body.picture != undefined) {
+
+                let dbUser = null;
+
+                if (collectionExists) {
+                    console.log("doing find one...");
+                    dbUser = await db.collection("users").findOne({email});
+                }
+
+                console.log(`dbUser = `, dbUser);
+
+                if (dbUser) {
+                    res.status(200).json({status:200, data:dbUser})
+                }
+                else {
+                    const newUser = {_id: uuidv4(), firstName, lastName, email, picture, initials: `${firstName.slice(0,1)}${lastName.slice(0,1)}`, boards:[]}
+                    console.log("doing insertOne..."+`${firstName.slice(0,1)}${lastName.slice(0,1)}`) ;
+                    const insertResult = await db.collection("users").insertOne(newUser);
+
+                    if (insertResult && insertResult.acknowledged)
+                        res.status(200).json({status: 200, data: newUser});
+                }
+        }
+        else
+            throw new Error('The body requires email, given_name, family_name and picture fields');
+
+        //check if the user with the provided email already exists
+    }
+    catch(err) {
+        res.status(500).json({status:500, message: err.message});
+    }
+    finally {
+        console.log("closing");
+        client.close();
+    }
+}
+
 module.exports = {
   getUsers,
-  getUser,
+  getUserById,
+  getUserByEmail,
   getBoards,
-  getBoard
+  getBoard,
+  login
 };
