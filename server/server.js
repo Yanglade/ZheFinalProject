@@ -6,9 +6,11 @@ const morgan = require("morgan");
 
 const {
     getUsers,
-    getUser,
+    getUserById,
+    getUserByEmail,
     getBoards,
-    getBoard
+    getBoard,
+    login
 } = require("./handlers");
 
 
@@ -27,10 +29,12 @@ express()
     // ---------------------------------
     
     .get("/api/get-users", getUsers)
-    .get("/api/get-user/:_id", getUser)
+    .get("/api/get-user-by-id/:_id", getUserById)
+    .get("/api/get-user-by-email/:email", getUserByEmail)
     .get("/api/get-boards", getBoards)
     .get("/api/get-board/:_id", getBoard)
     .get("/api/get-boards-for-user/:userId", getBoard)
+    .post("/api/add-user", login)
 
 
       // ---------------------------------
