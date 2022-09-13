@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
 import UserProvider from "./context/UserContext";
 
+
 // const root = ReactDOM.createRoot(document.getElementById('root'));
 // root.render(
 //   <React.StrictMode>
@@ -16,8 +17,8 @@ import UserProvider from "./context/UserContext";
 ReactDOM.render(
   <React.StrictMode>
     <Auth0Provider 
-      domain="dev-qnlaia4l.us.auth0.com"
-      clientId="x3drZaEn8agYYg49vHIm5G0JdmygY3QG"
+      domain= {process.env.REACT_APP_DOMAIN} //"dev-qnlaia4l.us.auth0.com"
+      clientId= {process.env.REACT_APP_CLIENT_ID} //"x3drZaEn8agYYg49vHIm5G0JdmygY3QG"
       redirectUri={window.location.origin}
     >
       <UserProvider>

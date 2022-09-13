@@ -5,23 +5,23 @@ import {useAuth0} from "@auth0/auth0-react";
 import {UserContext} from "../context/UserContext";
 
 
-const Header = () => {  
+const Header = ({logout}) => {  
 
-  const {logout} = useAuth0();
-  const {state} = useContext(UserContext);
+  // const {logout} = useAuth0();
+  const {userState} = useContext(UserContext);
 
-  console.log(`state.............................. = `, state);
+  console.log(`userState.............................. = `, userState);
 
   return (
     <Wrapper>
       <NavLink to="/">Home</NavLink>
-       <NavLink to="/board">Board</NavLink>
+       <NavLink to="/board/1">Board</NavLink>
        <NavLink to="/treeview">Treeview</NavLink>
        <NavLink to="/inspirational">Inspirational</NavLink>
        <NavLink to="/calendar">Calendar</NavLink>
        {/* <NavLink to="/">Login</NavLink> */}
        <UserDiv>
-        <UserAvatar><img style={{height:"100%",width:"auto"}}src={state.picture}/></UserAvatar>
+        <UserAvatar><img style={{height:"100%",width:"auto"}}src={userState.picture}/></UserAvatar>
         <LogoutButton onClick={()=>logout()}>Logout</LogoutButton>
        </UserDiv>
        

@@ -5,12 +5,14 @@ import Task from "./Task";
 import { Dialog, DialogOverlay, DialogContent } from "@reach/dialog";
 import "@reach/dialog/styles.css";
 
-const Column = ({column, tasks, isDropDisabled, index, state, setState}) => {
+const Column = ({column, tasks, isDropDisabled, index, boardState, setBoardState}) => {
 const [showDialog, setShowDialog] = React.useState(false);
 const open = () => setShowDialog(true);
 const close = () => setShowDialog(false);
 const addTaskBtnRef = useRef();
 const columnNameRef = useRef();
+
+console.log(`Column: ${column.id} = `, tasks);
 
   // const InnerList = ({tasks}) => {
   //   return (
@@ -21,14 +23,14 @@ const columnNameRef = useRef();
   // const MemoInnerList = memo(InnerList);
 
   const allTasksAreNamed = () => {
-    return !tasks.some(aTask => (aTask.named === undefined || !aTask.named));
+    return !tasks.some(aTask => (aTask == undefined || aTask.named == undefined || !aTask.named));
   }
 
 
 
   const addTask = () => {
     console.log("in add task");
-    const newTaskId = `task-${Object.keys(state.tasks).length+1}`;
+    const newTaskId = `task-${Object.keys(boardState.tasks).length+1}`;
     const newTask = {id: newTaskId, content: newTaskId, details:{image_url: "../../client/public/favicon.ico"}};
     addTaskBtnRef.current.disabled = true;
     // const newContent = `<div><img src='../../puclic/favicon.ico'/><label>${newTaskId}</label> </div>`;
@@ -37,7 +39,7 @@ const columnNameRef = useRef();
 
     //open();
 
-    setState({...state, tasks: {...state.tasks, [newTaskId]: newTask }, columns: {...state.columns, [column.id]: {...column, taskIds: [...column.taskIds, newTaskId]}}});
+    setBoardState({...boardState, tasks: {...boardState.tasks, [newTaskId]: newTask }, columns: {...boardState.columns, [column.id]: {...column, taskIds: [...column.taskIds, newTaskId]}}});
   }
 
   const focusAddTask = () => {
@@ -51,7 +53,7 @@ const columnNameRef = useRef();
     // alert(`e.target.value:${e.target.value === ""}...`);
     //console.log(`e.target.value = `, e.target.value);
     if (e.charCode === 13 && e.target.value !== "") {
-      setState({...state, columns:{...state.columns, [column.id]: {...column, named: true, title: e.target.value}}});
+      setBoardState({...boardState, columns:{...boardState.columns, [column.id]: {...column, named: true, title: e.target.value}}});
     }
     else if (e.charCode === 13) {
       e.preventDefault();
@@ -60,12 +62,12 @@ const columnNameRef = useRef();
 
   const deleteNewColumn = (e) => {
     e.preventDefault();
-    const newState = {...state};
-     delete state.columns[column.id];
+    const newBoardState = {...boardState};
+     delete boardState.columns[column.id];
 
-     newState.columnOrder = newState.columnOrder.filter(aColumn => aColumn != column.id); //aTask != task.id
-     console.log(`state = `, newState);
-     setState(newState);
+     newBoardState.columnOrder = newBoardState.columnOrder.filter(aColumn => aColumn != column.id); //aTask != task.id
+     console.log(`boardState = `, newBoardState);
+     setBoardState(newBoardState);
   }
 
    return (
@@ -108,8 +110,10 @@ const columnNameRef = useRef();
                 {...provided.droppableProps}
                 isDraggingOver = {snapshot.isDraggingOver}
               > 
-                  {tasks.map((task, index) => <Task key={task.id} task={task} index={index} setState={setState} state={state} column={column} focusAddTask={focusAddTask}/>)} 
+                   {/* {((tasks !== undefined) && (tasks != {}) && (tasks !== []) && (tasks.length > 0)) && tasks.map((task, index) => task && <Task key={task.id} task={task} index={index} setBoardState={setBoardState} boardState={boardState} column={column} focusAddTask={focusAddTask}/>)}  */}
+                   {tasks.map((task, index) => task && <Task key={task.id} task={task} index={index} setBoardState={setBoardState} boardState={boardState} column={column} focusAddTask={focusAddTask}/>)} 
                   {/* <MemoInnerList tasks={tasks}/> */}
+                  {/* <div>{tasks.length}</div> */}
                   {provided.placeholder}
               </TaskList>
             )}

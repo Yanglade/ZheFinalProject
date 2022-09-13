@@ -1,14 +1,14 @@
 [
   {
     "firstName": "Yves",
-    "LastName": "Anglade",
+    "lastName": "Anglade",
     "email": "ya@gmail.com",
     "_id": "1",
     "boards":["1"]
   },
   {
     "firstName": "Deavon",
-    "LastName": "Dawkins",
+    "lastName": "Dawkins",
     "email":"dg@gmail.com",
     "_id": "2",
     "boards":["2"]
