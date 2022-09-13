@@ -251,7 +251,78 @@ const getBoard = async (req, res) => {
 };
 
 /**********************************************************/
-/*  getBoard: returns a list of all boards
+/*  getBoardsForUser: returns boards accessible for a given user
+/**********************************************************/
+const getBoardsForUser = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const dbName = "finalProject";
+    const {userId} = req.params;
+
+    console.log(`getBoardsForUser param: userId = `, userId);
+
+    try {
+        // connect...
+        await client.connect();
+        // declare 'db'
+        const db = client.db(dbName);
+  
+        const collections = await db.listCollections().toArray();
+        const boardsCollectionExists = collections.some(c => c.name === "boards");
+        const usersCollectionExists = collections.some(c => c.name === "users");
+  
+        if (!boardsCollectionExists)
+            throw new Error('boards collection does not exist');
+
+        if (!usersCollectionExists)
+            throw new Error('users collection does not exist');
+
+        const user = await db.collection("users").findOne({_id: userId});
+
+        if (user) {
+
+            const userBoardsIdsArr = user.boards;
+
+            console.log(`getBoardsForUser...user = `, user);
+
+            console.log(`getBoardsForUser...userBoardsIdsArr = `, userBoardsIdsArr);
+
+            const userBoardsArr = await db.collection("boards").find({_id: { $in: userBoardsIdsArr}}).toArray();
+
+            console.log(`getBoardsForUser...userBoardsArr = `, userBoardsArr);
+
+            if (userBoardsArr) {
+
+                res.status(200).json({
+                    status: 200,
+                    _id: userId,
+                    boards: userBoardsArr
+                });
+            }
+            else {
+                res.status(400).json({
+                    status: 400,
+                    message: "Cannot find boards that are accessible to this user"
+                })
+            }
+        }
+        else {
+            return res.status(400).json({
+                status: 400,
+                message: `There is no user available with _id: ${userId}`
+            })
+        }
+  
+    }
+    catch(err) {
+        return res.status(500).json({status:500, message: err.message});
+    }
+    finally {
+        client.close();
+    }
+  };
+
+/**********************************************************/
+/*  login: returns a list of all boards
 /**********************************************************/
 const login = async (req, res) => { //login
     // check if user exists
@@ -287,7 +358,8 @@ const login = async (req, res) => { //login
                 console.log(`dbUser = `, dbUser);
 
                 if (dbUser) {
-                    res.status(200).json({status:200, data:dbUser})
+                    console.log(`login...dbUser = `, dbUser)
+                    return res.status(200).json({status:200, data:dbUser})
                 }
                 else {
                     const newUser = {_id: uuidv4(), firstName, lastName, email, picture, initials: `${firstName.slice(0,1)}${lastName.slice(0,1)}`, boards:[]}
@@ -295,7 +367,7 @@ const login = async (req, res) => { //login
                     const insertResult = await db.collection("users").insertOne(newUser);
 
                     if (insertResult && insertResult.acknowledged)
-                        res.status(200).json({status: 200, data: newUser});
+                        return res.status(200).json({status: 200, data: newUser});
                 }
         }
         else
@@ -312,11 +384,107 @@ const login = async (req, res) => { //login
     }
 }
 
+/**********************************************************/
+/*  createBoard: returns a list of all boards
+/**********************************************************/
+const createBoard = async (req, res) => {
+    // check if user exists
+    // if user exists return existing user
+    // is user odes not exist create a new user
+    const client = new MongoClient(MONGO_URI, options);
+    const dbName = "finalProject";
+
+    const aBoard = req.body;
+
+    const {tasks, columns, columnOrder, userIdsWithAccess, boardName} = aBoard;
+
+    console.log(`createBoard...aBoard = `, aBoard);
+
+    try {
+        // connect...
+        await client.connect();
+        // declare 'db'
+        const db = client.db(dbName);
+        let boardCount = 0;
+        let newBoard;
+        let boardId = 1;
+
+        if (tasks && columns && columnOrder, userIdsWithAccess) {
+
+            const collections = await db.listCollections().toArray();
+            const boardsCollectionExists = collections.some(c => c.name === "boards");
+            const usersCollectionExists = collections.some(c => c.name === "users");
+
+            //check number of boards if collection exists
+            if (boardsCollectionExists) {
+                boardCount = await db.collection("boards").countDocuments();
+                console.log(`createBoard...boardCount = `, boardCount);
+                boardId = boardCount + 1;
+                console.log(`createBoard...boardId = `, boardId);
+            }
+
+            if (!boardName) {
+
+                newBoard = {_id: `${boardId}`, ...aBoard, boardName: `Board-${boardId}`}
+            }
+            else {
+                newBoard = {...aBoard, _id: `${boardId}`};
+            }
+
+            //insert the new board
+            console.log(`newBoard...before insert = `, newBoard);
+            const insertBoardResult = await db.collection("boards").insertOne(newBoard);
+
+            if (insertBoardResult && insertBoardResult.acknowledged) {
+                
+                //update user to add new board
+                if (usersCollectionExists) {
+                    const boardUserId = `${userIdsWithAccess[0]}`;
+                    console.log(`boardUserId = `, boardUserId);
+                    const boardUser = await db.collection("users").findOne({_id: boardUserId});
+                    console.log(`boardUser = `, boardUser);
+                    console.log(`boardUser.boards = `, boardUser.boards);
+                    
+                    if (boardUser) {
+                        const updatedBoardsArr = [...boardUser.boards, `${boardId}`];
+                        const updateResult = await db.collection("users").updateOne({_id: `${userIdsWithAccess[0]}`}, {$set:{boards: updatedBoardsArr}});
+                        
+                        if (!updateResult || !updateResult.modifiedCount)
+                            throw new Error("Board added but user not updated");
+                    }
+                }
+
+                res.status(200).json({status: 200, data: newBoard});
+            }
+            else {
+                res.status(500).json({status: 500, message: "The new board could not be added properly"})
+            }
+
+        }
+        else {
+            throw new Error('The body requires tasks, columns, columnOrderfields, userIdsWithAccess'); 
+        }
+    }
+    catch(err) {
+        console.error("err =", err);
+        res.status(500).json({
+            status: 500,
+            message: err.message
+        });
+    }
+    finally {
+        console.log("closing");
+        client.close();
+    }
+}
+
 module.exports = {
   getUsers,
   getUserById,
   getUserByEmail,
   getBoards,
   getBoard,
-  login
+  getBoardsForUser,
+  login,
+  createBoard
 };

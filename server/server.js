@@ -10,7 +10,9 @@ const {
     getUserByEmail,
     getBoards,
     getBoard,
-    login
+    getBoardsForUser,
+    login,
+    createBoard
 } = require("./handlers");
 
 
@@ -33,8 +35,9 @@ express()
     .get("/api/get-user-by-email/:email", getUserByEmail)
     .get("/api/get-boards", getBoards)
     .get("/api/get-board/:_id", getBoard)
-    .get("/api/get-boards-for-user/:userId", getBoard)
+    .get("/api/get-boards-for-user/:userId", getBoardsForUser)
     .post("/api/add-user", login)
+    .post("/api/add-board", createBoard)
 
 
       // ---------------------------------

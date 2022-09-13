@@ -6,7 +6,7 @@ import {FaPencilAlt} from "react-icons/fa";
 import { Dialog, DialogOverlay, DialogContent } from "@reach/dialog";
 import "@reach/dialog/styles.css";
 
-const Task = ({ task, index, state, setState, column, focusAddTask }) => {
+const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) => {
   console.log(task);
   const isDragDisabled = !(task.named !== undefined && task.named === true); //condition for a task to be draggable
   const taskNameRef = useRef();
@@ -20,7 +20,7 @@ const Task = ({ task, index, state, setState, column, focusAddTask }) => {
   };
 
   const close = () => {
-    setState({...state, tasks: {...state.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}});
+    setBoardState({...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}});
     setShowDialog(false);
   };
 
@@ -38,7 +38,7 @@ const Task = ({ task, index, state, setState, column, focusAddTask }) => {
     // alert(`e.target.value:${e.target.value === ""}...`);
     //console.log(`e.target.value = `, e.target.value);
     if (e.charCode === 13 && e.target.value !== "") {
-      setState({...state, tasks:{...state.tasks, [task.id]: {...task, named: true, content: e.target.value}}});
+      setBoardState({...boardState, tasks:{...boardState.tasks, [task.id]: {...task, named: true, content: e.target.value}}});
       focusAddTask();
     }
     else if (e.charCode === 13) {
@@ -48,13 +48,13 @@ const Task = ({ task, index, state, setState, column, focusAddTask }) => {
 
   const deleteNewTask = (e) => {
     e.preventDefault();
-    console.log("tasks", state.tasks[`"${task.id}"`]);
-    const newState = {...state}
-     delete state.tasks[task.id];
+    console.log("tasks", boardState.tasks[`"${task.id}"`]);
+    const newBoardState = {...boardState}
+     delete boardState.tasks[task.id];
 
-     newState.columns[column.id].taskIds = newState.columns[column.id].taskIds.filter(aTask => aTask != task.id); //aTask != task.id
-     console.log(`state = `, newState);
-     setState(newState);
+     newBoardState.columns[column.id].taskIds = newBoardState.columns[column.id].taskIds.filter(aTask => aTask != task.id); //aTask != task.id
+     console.log(`boardState = `, newBoardState);
+     setBoardState(newBoardState);
   }
 
   return (

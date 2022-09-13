@@ -1,10 +1,11 @@
-import React, {useReducer} from 'react';
+import React, {useReducer, useState} from 'react';
+import { usePersistedState } from '../hooks/usePersistedState';
 
 export const UserContext = React.createContext();
 
-const initialState = {};
+const initialState = {boards:[]};
 
-const reducer = (state, action) => {
+const reducer = (userState, action) => {
   switch(action.type) {
 
     case 'test': {
@@ -22,15 +23,21 @@ const reducer = (state, action) => {
         lastName: action.lastName,
        // picture: action.picture,
         boards: action.boards,
-        initials: action.initials
+        initials: action.initials,
+        _id: action._id
       }
     }
+
+    default: 
+      throw new Error("Unrecognized type")
   }
 }
 
 const UserProvider = ({children}) => {
   
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [userState, dispatch] = useReducer(reducer, initialState);
+  const [persistedUser, setPersistedUser] = usePersistedState(userState, "persisted-user");
+  const [boardsForUser, setBoardsForUser] = useState([]);
 
   const testFunction = ()=> {
     const action = {
@@ -49,6 +56,8 @@ const UserProvider = ({children}) => {
     //   picture: user.picture
     // }
 
+    let userId;
+
     const postOptions = {
       method: "POST",
       headers: {"Content-Type":"application/json"},
@@ -62,31 +71,53 @@ const UserProvider = ({children}) => {
 
     try {
 
-      fetch("/api/add-user", postOptions)
-      .then((res) => res.json())
-      .then((json) => {
+      const res = await fetch("/api/add-user", postOptions)
+      const json = await res.json();
+      
         const {status} = json;
-        console.log(`status = `, status);
+        // console.log(`status = `, status);
         if (status === 200) {
           const {data} = json;
-          console.log(`data = `, data);
+          console.log(`UserContext_data = `, data);
           const action = {
             type: "set-user",
             email: data.email,
             firstName: data.firstName,
-            LastName: data.lastName,
+            lastName: data.lastName,
             picture: data.picture,
             boards: data.boards,
-            initials: data.initials
+            initials: data.initials,
+            _id: data._id
           }
+
+          userId = data._id;
+
+          setPersistedUser({
+            _id: data._id
+          });
       
           dispatch(action);
-          // state = data;
+
         }
-      })
+      }
+    catch(err) {
+      console.error(err.message);
+    }
+
+
+    //getBoards available for the user
+    try {
+      const res = await fetch(`/api/get-boards-for-user/${userId}`);
+      const json = await res.json();
+      const {status} = json;
+      if (status === 200) {
+        const {boards} = json;
+        setBoardsForUser(boards)
+      }
+
     }
     catch(err) {
-      alert(err.message);
+      console.error("Error while fetching boards for the user", err.message);
     }
 
     //Existing User, send back the user object from the database
@@ -105,7 +136,7 @@ const UserProvider = ({children}) => {
   };
 
   return (
-  <UserContext.Provider value = {{state, actions: {
+  <UserContext.Provider value = {{userState, persistedUser, setPersistedUser, boardsForUser, setBoardsForUser, actions: {
     createUserAndReceiveInfo,
     testFunction
     }}}>

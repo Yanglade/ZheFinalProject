@@ -1,37 +1,40 @@
 import React, {useEffect, useState, useContext} from "react";
 import styled, {keyframes} from "styled-components";
 import Header from "../components/Header";
-// import BoardOverview from "../components/BoardsOverview";
-import UserContext from "../context/UserContext";
+import BoardOverview from "../components/BoardsOverview";
+import {UserContext} from "../context/UserContext";
 import { FiLoader } from "react-icons/fi";
 
 
-const Dashboard = () => {
+const Dashboard = ({logout}) => {
 
-  const {loading, setLoading} = useState(true);
-  // const {state} = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
+  const {userState} = useContext(UserContext);
 
-  // useEffect(()=> {
-  //   state && setLoading(false);
-  // }, [state])
+  console.log(`state in Dashboard = `, userState);
+
+  useEffect(()=> {
+    if (userState !== undefined) 
+      setLoading(false);
+  }, [userState])
 
   return (
-    // loading ? (
-    //   <LoaderDiv>
-    //     <FiLoader />
-    //   </LoaderDiv>
-    //   ):( 
+    loading ? (
+      <LoaderDiv>
+        <FiLoader />
+      </LoaderDiv>
+      ):( 
     <DashBoardWrapper> 
-      <Header/>
+      <Header logout={logout}/>
       <DashBoardSections>
-        <BoardDiv/>
+        <BoardDiv><BoardOverview/></BoardDiv>
         <WeatherDiv/>
         <InspirationalDiv/>
         <OtherDiv/>
       </DashBoardSections>
     </DashBoardWrapper>
     )
-  // )
+  )
 };
 
 const DashBoardWrapper = styled.div`
@@ -51,7 +54,7 @@ const DashBoardSections = styled.div`
 
 const BoardDiv = styled.div`
   width: 40%;
-  height: auto;
+  height: 40%;
   border: 1px solid blue;
   margin: 10px;
   border-radius: 10px;
@@ -60,7 +63,7 @@ const BoardDiv = styled.div`
 
 const WeatherDiv = styled.div`
   width: 40%;
-  height: auto;
+  height: 40%;
   border: 1px solid blue;
   margin: 10px;
   border-radius: 10px;
@@ -69,7 +72,7 @@ const WeatherDiv = styled.div`
 
 const InspirationalDiv = styled.div`
   width: 40%;
-  height: auto;
+  height: 40%;
   border: 1px solid blue;
   margin: 10px;
   margin: 10px;
@@ -79,7 +82,7 @@ const InspirationalDiv = styled.div`
 
 const OtherDiv = styled.div`
   width: 40%;
-  height: auto;
+  height: 40%;
   border: 1px solid blue;
   margin: 10px;
   border-radius: 10px;
@@ -101,8 +104,8 @@ const LoaderDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   animation: ${rotate} infinite 4s linear;
 `;
 
