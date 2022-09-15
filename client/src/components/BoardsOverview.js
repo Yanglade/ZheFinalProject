@@ -1,8 +1,9 @@
 import React, {useContext, useEffect, useState} from "react";
 import {UserContext} from "../context/UserContext";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
 import {NavLink} from "react-router-dom";
 import initialData from "../data/new-empty-board";
+import { FiLoader } from "react-icons/fi";
 
 const BoardOverview = () => {
 
@@ -16,6 +17,7 @@ const BoardOverview = () => {
   console.log(`createNewBoard...initialData = `, initialData);
   console.log(`createNewBoard...state = `, userState);
   console.log("createNewBoard...boardsForUser", boardsForUser);
+  console.log("createNewBoard...userState.boardsForUser", userState.boardsForUser);
   console.log("createNewBoard...userState._id", userState._id);
 
     const postOptions = {
@@ -58,36 +60,50 @@ const BoardOverview = () => {
   }
 
   useEffect(()=> {
+    setLoading(true)
+    if (userState.boardsForUser)
+      setLoading(false);
 
-  }, [userState]);
+  }, [userState.boardsForUser]);
 
   return (
-    <BoardOverviewWrapper>
-      <TitleDiv style={{fontWeight: "bold", textAlign:"center"}}>Board Overview</TitleDiv>
-      {
-      userState.boards.length ? (
-        <>
-          <div> You have {`${userState.boards.length}`} board(s):</div>
-          <BoardsList>
-            {
-              boardsForUser.map(board => {
-                return <NavLink key={board._id} to={`/board/${board._id}`}>{board.boardName}</NavLink>
-                // return <NavLink key={board._id} to={`/board/1`}>{board.boardName}</NavLink>
-              })
-            }
-          </BoardsList>
-          <CreateButtonDiv>
+    
+     loading ? (
+      <BoardOverviewWrapper>
+        <SpinnerWrapper>
+          <LoaderDiv>
+            <FiLoader />
+          </LoaderDiv>
+        </SpinnerWrapper>
+      </BoardOverviewWrapper>
+      ): (
+        <BoardOverviewWrapper>
+        <TitleDiv style={{fontWeight: "bold", textAlign:"center"}}>Board Overview</TitleDiv>
+        {
+        userState.boards.length ? (
+          <>
+            <div> You have {`${userState.boards.length}`} board(s):</div>
+            <BoardsList>
+              {
+                boardsForUser.map(board => {
+                  return <NavLink key={board._id} to={`/board/${board._id}`}>{board.boardName}</NavLink>
+                  // return <NavLink key={board._id} to={`/board/1`}>{board.boardName}</NavLink>
+                })
+              }
+            </BoardsList>
+            <CreateButtonDiv>
+              <CreateBoardBtn onClick={()=>createNewBoard()}>Create a new board</CreateBoardBtn>
+            </CreateButtonDiv>
+          </>
+          )
+          :
+          <NoBoardsDiv>
+            <div> You don't have any boards</div>
             <CreateBoardBtn onClick={()=>createNewBoard()}>Create a new board</CreateBoardBtn>
-          </CreateButtonDiv>
-        </>
-        )
-        :
-        <NoBoardsDiv>
-          <div> You don't have any boards</div>
-          <CreateBoardBtn onClick={()=>createNewBoard()}>Create a new board</CreateBoardBtn>
-        </NoBoardsDiv>
-      }  
-    </BoardOverviewWrapper>
+          </NoBoardsDiv>
+        } 
+        </BoardOverviewWrapper>
+      )
   )
 }
 
@@ -124,7 +140,36 @@ const BoardOverviewWrapper = styled.div`
 const CreateButtonDiv = styled.div`
   display: flex;
   justify-content: center;
-`
+`;
+
+const SpinnerWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const LoaderDiv = styled.div`
+  font-size: 50px;
+  color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* width: 100%;
+  height: 100%; */
+  animation: ${rotate} infinite 4s linear;
+`;
 
 
 

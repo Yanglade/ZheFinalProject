@@ -1,4 +1,5 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useRef, useEffect, useContext} from "react";
+import {UserContext} from "../context/UserContext";
 import styled, {keyframes} from "styled-components";
 import Column from "../components/Column";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
@@ -8,6 +9,7 @@ import { usePersistedState } from "../hooks/usePersistedState";
 import "@reach/dialog/styles.css";
 import {useParams} from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
+import {FaPencilAlt} from "react-icons/fa";
 
 const Board = () => {;
   // const [state, setState] = useState(initialData);
@@ -21,6 +23,12 @@ const Board = () => {;
   const dialogButtonRef = useRef();
   const {boardId} = useParams();
   const [loading, setLoading] = useState();
+  const {userState, actions} = useContext(UserContext);
+  const selectBoardRef = useRef();
+  const inputBoardRenameRef = useRef();
+  const boardRenameDivRef = useRef();
+  const editButtonRef = useRef();
+  const [isEditing, setIsEditing] = useState(false);
 
   // const {searchParams} = useSearchParams();
 
@@ -37,14 +45,14 @@ const Board = () => {;
   //   document.body.style.transition = "background-color 0.2s ease";
   // };
 
-  const updateBoardStates = async (board) => {
-    setBoardState(board);
-    setPersistedBoardId(board._id);
-    if (boardState !== initialBoardState) {
-      setLoading(false);
+  // const updateBoardStates = async (board) => {
+  //   setBoardState(board);
+  //   setPersistedBoardId(board._id);
+  //   if (boardState !== initialBoardState) {
+  //     setLoading(false);
 
-    }
-  }
+  //   }
+  // }
 
   useEffect(async()=> {
     console.log("UseEffect8s8s8s88s8s8s8s8s8s88s8");
@@ -58,12 +66,50 @@ const Board = () => {;
     setPersistedBoardId(board._id);
     if (boardState !== initialBoardState)
       setLoading(false);
-  
 
-    
-      console.log("Set loading is false now .....................................................");
+    }, [boardState._id, userState]);
 
-    }, [boardState._id]);
+    const editBoardName = () => {
+      inputBoardRenameRef.current.placeholder = selectBoardRef.current.value;
+      inputBoardRenameRef.current.value = "";
+      selectBoardRef.current.style.display = "none";
+      boardRenameDivRef.current.style.display = "inline";
+      inputBoardRenameRef.current.focus();
+      editButtonRef.current.style.display = "none";
+
+    }
+
+    const boardSelection = () => {
+      console.log("boardSelection!!!!!");
+      inputBoardRenameRef.current.placeholder = selectBoardRef.current.value;
+      inputBoardRenameRef.current.value = "";
+    }
+
+    const cancelEdit = () => {
+        inputBoardRenameRef.current.placeholder = selectBoardRef.current.value;
+        inputBoardRenameRef.current.value = "";
+        boardRenameDivRef.current.style.display = "none";
+        selectBoardRef.current.style.display = "inline";
+        editButtonRef.current.style.display = "inline";
+    }
+
+    const onEnter = (e) => {
+      // e.preventDefault();
+      e.stopPropagation();
+      // alert(`e.target.value:${e.target.value === ""}...`);
+      //console.log(`e.target.value = `, e.target.value);
+      if (e.charCode === 13 && e.target.value !== "") {
+        boardRenameDivRef.current.style.display = "none";
+        selectBoardRef.current.style.display = "inline";
+        editButtonRef.current.style.display = "inline";
+        const newBoardState = {...boardState, boardName: e.target.value};
+        setBoardState(newBoardState);
+        actions.updateBoard(newBoardState, userState);
+      }
+      else if (e.charCode === 13) {
+        e.preventDefault();
+      }
+    }
       
 
   const onDragStart = start => {
@@ -194,6 +240,19 @@ const Board = () => {;
     ): (
     <>
       <Header/>
+      <BoardNameSection>
+        <BoardNamesLabel htlmfor="boardNames">Boards:</BoardNamesLabel>
+        <SelectBoard ref={selectBoardRef} onChange={boardSelection} name="boardNames" id="boardNames">
+          { 
+            userState.boardsForUser.map(board => <option key={board._id} value={board.boardName}>{board.boardName}</option>)
+          }
+        </SelectBoard>
+        <BoardRenameDiv ref={boardRenameDivRef} >
+          <BoardRenameInput ref={inputBoardRenameRef} onKeyPress={(e)=>onEnter(e)} placeholder={boardState.boardName}/>
+          <CancelEditButton onClick={cancelEdit} title="Cancel rename">X</CancelEditButton>
+        </BoardRenameDiv>
+        <EditButton ref={editButtonRef} onClick={editBoardName} title="Rename the board"><FaPencilAlt/></EditButton>
+      </BoardNameSection>
       <BoardArea>
       <DragDropContext
         // onDragStart={onDragStart}
@@ -284,6 +343,58 @@ const LoaderDiv = styled.div`
   /* width: 100%;
   height: 100%; */
   animation: ${rotate} infinite 4s linear;
+`;
+
+const BoardNameSection = styled.div`
+  width: 100vw;
+  height: 50px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  background-color: cadetblue;
+`;
+
+const BoardNamesLabel = styled.label`
+  margin: 0px 15px;
+`;
+
+const SelectBoard = styled.select`
+  width: 200px;
+  height: 30px;
+`;
+
+const EditButton = styled.div`
+  /* position:absolute; 
+  top:-6px;
+  left:95%; */
+  color:black;
+  width:15px;
+  border:none; 
+  background-color:inherit;
+  margin-left: 20px;
+  /* display:none; */
+  &:hover{
+    cursor: pointer;
+  }
+`;
+
+const BoardRenameDiv = styled.div`
+  display: none;
+`;
+
+const BoardRenameInput = styled.input`
+  width: 200px;
+  height: 24px;
+  /* display: none; */
+  padding-left: 5px;
+`;
+
+const CancelEditButton = styled.button`
+  height: 20px;
+  color: red;
+  margin:0px 5px;
+  font-weight: bold;
+  vertical-align: bottom;
 `;
 
 export default Board;
