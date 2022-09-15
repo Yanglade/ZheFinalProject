@@ -15,14 +15,14 @@ const Header = ({logout}) => {
   return (
     <Wrapper>
       <NavLink to="/">Home</NavLink>
-       <NavLink to="/board/1">Board</NavLink>
+       {userState.boardsForUser && userState.boardsForUser.length && <NavLink to={`/board/${userState.boardsForUser[0]._id}`}>Board</NavLink>}
        <NavLink to="/treeview">Treeview</NavLink>
        <NavLink to="/inspirational">Inspirational</NavLink>
        <NavLink to="/calendar">Calendar</NavLink>
        {/* <NavLink to="/">Login</NavLink> */}
        <UserDiv>
         <UserAvatar><img style={{height:"100%",width:"auto"}}src={userState.picture}/></UserAvatar>
-        <LogoutButton onClick={()=>logout()}>Logout</LogoutButton>
+        <LogoutButton onClick={()=>logout?.()}>Logout</LogoutButton>
        </UserDiv>
        
     </Wrapper>

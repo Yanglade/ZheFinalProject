@@ -12,7 +12,8 @@ const {
     getBoard,
     getBoardsForUser,
     login,
-    createBoard
+    createBoard,
+    updateBoard
 } = require("./handlers");
 
 
@@ -38,6 +39,7 @@ express()
     .get("/api/get-boards-for-user/:userId", getBoardsForUser)
     .post("/api/add-user", login)
     .post("/api/add-board", createBoard)
+    .put("/api/update-board", updateBoard)
 
 
       // ---------------------------------

@@ -21,10 +21,23 @@ const reducer = (userState, action) => {
         picture: action.picture,
         firstName: action.firstName,
         lastName: action.lastName,
-       // picture: action.picture,
         boards: action.boards,
         initials: action.initials,
-        _id: action._id
+        _id: action._id,
+        boardsForUser: action.boardsForUser
+      }
+    }
+
+    case 'update-board': {
+      return {
+        email: action.email,
+        picture: action.picture,
+        firstName: action.firstName,
+        lastName: action.lastName,
+        boards: action.boards,
+        initials: action.initials,
+        _id: action._id,
+        boardsForUser: action.boardsForUser
       }
     }
 
@@ -57,6 +70,7 @@ const UserProvider = ({children}) => {
     // }
 
     let userId;
+    let preAction;
 
     const postOptions = {
       method: "POST",
@@ -79,7 +93,9 @@ const UserProvider = ({children}) => {
         if (status === 200) {
           const {data} = json;
           console.log(`UserContext_data = `, data);
-          const action = {
+
+          //const action
+           preAction= {
             type: "set-user",
             email: data.email,
             firstName: data.firstName,
@@ -96,7 +112,7 @@ const UserProvider = ({children}) => {
             _id: data._id
           });
       
-          dispatch(action);
+          // dispatch(action);
 
         }
       }
@@ -112,7 +128,13 @@ const UserProvider = ({children}) => {
       const {status} = json;
       if (status === 200) {
         const {boards} = json;
-        setBoardsForUser(boards)
+        setBoardsForUser(boards);
+        const action = {
+          ...preAction,
+          boardsForUser: boards
+        }
+
+        dispatch(action);
       }
 
     }
@@ -135,10 +157,61 @@ const UserProvider = ({children}) => {
     */
   };
 
+  const updateBoard = async (board, aUserState) => {
+    
+    let userId;
+    let preAction;
+
+    const postOptions = {
+      method: "PUT",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        ...board
+      })
+    }
+
+    try {
+
+      const res = await fetch("/api/update-board", postOptions)
+      const json = await res.json();
+      
+      const {status} = json;
+      // console.log(`status = `, status);
+      if (status === 200) {
+        const {board} = json;
+        console.log(`UserContext_updatedBoard = `, board);
+
+        const newBoardsForUser = aUserState.boardsForUser.map(aboard => {
+          if (aboard._id === board._id) {
+            return board;
+          }
+          else {
+            return aboard;
+          }
+        })
+
+        console.log(`newBoardsForUser--after rename = `, newBoardsForUser);
+
+        const action = {
+          type: "update-board",
+          ...aUserState,
+          boardsForUser: newBoardsForUser
+        }
+
+        dispatch(action);
+
+      }
+    }
+    catch (err) {
+      console.err(err.message);
+    }
+  }
+
   return (
   <UserContext.Provider value = {{userState, persistedUser, setPersistedUser, boardsForUser, setBoardsForUser, actions: {
     createUserAndReceiveInfo,
-    testFunction
+    testFunction,
+    updateBoard
     }}}>
     {children}
   </UserContext.Provider>

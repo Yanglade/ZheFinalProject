@@ -48,7 +48,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route exact path="/" element={<Dashboard logout={logout}/>} />
-            // <Route exact path="/boards" element={<Board/>} />
+            <Route exact path="/board" element={<Board/>} />
             <Route exact path="/board/:boardId" element={<Board/>} />
             <Route exact path="/treeview" element={<Treeview/>} />
             <Route exact path="/inspirational" element={<Inspirational/>} />

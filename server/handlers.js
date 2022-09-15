@@ -478,6 +478,46 @@ const createBoard = async (req, res) => {
     }
 }
 
+/**********************************************************/
+/*  createBoard: returns a list of all boards
+/**********************************************************/
+const updateBoard = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const dbName = "finalProject";
+
+    const aBoard = req.body;
+
+    console.log(`aBoard = `, aBoard);
+    console.log(`aBoard._id = `, aBoard._id)
+
+    const {tasks, columns, columnOrder, userIdsWithAccess, boardName} = aBoard;
+
+    try {
+        // connect...
+        await client.connect();
+        // declare 'db'
+        const db = client.db(dbName);
+
+        const collections = await db.listCollections().toArray();
+        const boardsCollectionExists = collections.some(c => c.name === "boards");
+        const usersCollectionExists = collections.some(c => c.name === "users");
+
+        if (boardsCollectionExists) {
+            const updateBoardResult = await db.collection("boards").updateOne({_id: `${aBoard._id}`}, {$set:{...aBoard}});
+
+            if (updateBoardResult && updateBoardResult.modifiedCount) {
+                res.status(200).json({status:200, board: aBoard});
+            }
+        }
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+    finally {
+        client.close();
+    }
+}
+
 module.exports = {
   getUsers,
   getUserById,
@@ -486,5 +526,6 @@ module.exports = {
   getBoard,
   getBoardsForUser,
   login,
-  createBoard
+  createBoard,
+  updateBoard
 };
