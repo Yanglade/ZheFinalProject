@@ -7,7 +7,7 @@ import { FiLoader } from "react-icons/fi";
 
 const BoardOverview = () => {
 
-  const {userState, boardsForUser, setBoardsForUser} = useContext(UserContext);
+  const {userState, actions} = useContext(UserContext);
   const [loading, setLoading] = useState();
 
   console.log(`state in BoardsOverview = `, userState);
@@ -16,7 +16,7 @@ const BoardOverview = () => {
 
   console.log(`createNewBoard...initialData = `, initialData);
   console.log(`createNewBoard...state = `, userState);
-  console.log("createNewBoard...boardsForUser", boardsForUser);
+  console.log("createNewBoard...boardsForUser", userState.boardsForUser);
   console.log("createNewBoard...userState.boardsForUser", userState.boardsForUser);
   console.log("createNewBoard...userState._id", userState._id);
 
@@ -45,7 +45,7 @@ const BoardOverview = () => {
 
             if (status === 200) {
               const {boards} = json;
-              setBoardsForUser(boards);
+              actions.setBoardsForUser(boards);
             }
           }
           catch (err){
@@ -85,7 +85,7 @@ const BoardOverview = () => {
             <div> You have {`${userState.boards.length}`} board(s):</div>
             <BoardsList>
               {
-                boardsForUser.map(board => {
+                userState.boardsForUser.map(board => {
                   return <NavLink key={board._id} to={`/board/${board._id}`}>{board.boardName}</NavLink>
                   // return <NavLink key={board._id} to={`/board/1`}>{board.boardName}</NavLink>
                 })

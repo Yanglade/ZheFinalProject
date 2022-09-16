@@ -50,7 +50,6 @@ const UserProvider = ({children}) => {
   
   const [userState, dispatch] = useReducer(reducer, initialState);
   const [persistedUser, setPersistedUser] = usePersistedState(userState, "persisted-user");
-  const [boardsForUser, setBoardsForUser] = useState([]);
 
   const testFunction = ()=> {
     const action = {
@@ -82,6 +81,8 @@ const UserProvider = ({children}) => {
         picture: user.picture
       })
     }
+
+    console.log(`Create and receive info postOptions = `, postOptions);
 
     try {
 
@@ -128,7 +129,7 @@ const UserProvider = ({children}) => {
       const {status} = json;
       if (status === 200) {
         const {boards} = json;
-        setBoardsForUser(boards);
+
         const action = {
           ...preAction,
           boardsForUser: boards
@@ -170,10 +171,14 @@ const UserProvider = ({children}) => {
       })
     }
 
+    console.log(`updateBoard...postOptions = `, postOptions);
+
     try {
 
       const res = await fetch("/api/update-board", postOptions)
       const json = await res.json();
+
+      console.log(`json from updateBoard = `,json);
       
       const {status} = json;
       // console.log(`status = `, status);
@@ -201,14 +206,17 @@ const UserProvider = ({children}) => {
         dispatch(action);
 
       }
+      // else if (status === 304) {
+      //   console.log("caught in 304...................");
+      // }
     }
-    catch (err) {
-      console.err(err.message);
+    catch(err) {
+      console.error(err.message);
     }
   }
 
   return (
-  <UserContext.Provider value = {{userState, persistedUser, setPersistedUser, boardsForUser, setBoardsForUser, actions: {
+  <UserContext.Provider value = {{userState, persistedUser, setPersistedUser, actions: {
     createUserAndReceiveInfo,
     testFunction,
     updateBoard

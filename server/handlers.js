@@ -49,16 +49,16 @@ const getUsers = async (req, res) => {
 
       if (usersArray.length > 0) {
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 200,
             users: usersArray,
         });
       }
       else
-        res.status(404).json({status:404, message:"There no user available"});
+        return res.status(404).json({status:404, message:"There no user available"});
   }
   catch(err) {
-      res.status(500).json({status:500, message: err.message});
+      return res.status(500).json({status:500, message: err.message});
   }
   finally {
       client.close();
@@ -180,14 +180,10 @@ const getBoards = async (req, res) => {
 
     const boardsArray =  await db.collection("boards").find().toArray();
 
-    //   const boardsArray =  ((await db.collection("boards").find().toArray()).map(aBoard => {
-    //       const {board} = aBoard;
-    //       return {board};
-    //   }));
-
       if (boardsArray.length > 0) {
 
-          return res.json({
+          return res.status(200).json({
+              status:200,
               boards: boardsArray,
               });
       }
@@ -288,18 +284,18 @@ const getBoardsForUser = async (req, res) => {
 
             const userBoardsArr = await db.collection("boards").find({_id: { $in: userBoardsIdsArr}}).toArray();
 
-            console.log(`getBoardsForUser...userBoardsArr = `, userBoardsArr);
+            // console.log(`getBoardsForUser...userBoardsArr = `, userBoardsArr);
 
             if (userBoardsArr) {
 
-                res.status(200).json({
+                return await res.status(200).json({
                     status: 200,
                     _id: userId,
                     boards: userBoardsArr
                 });
             }
             else {
-                res.status(400).json({
+                return await res.status(400).json({
                     status: 400,
                     message: "Cannot find boards that are accessible to this user"
                 })
@@ -376,7 +372,7 @@ const login = async (req, res) => { //login
         //check if the user with the provided email already exists
     }
     catch(err) {
-        res.status(500).json({status:500, message: err.message});
+        return res.status(500).json({status:500, message: err.message});
     }
     finally {
         console.log("closing");
@@ -454,10 +450,10 @@ const createBoard = async (req, res) => {
                     }
                 }
 
-                res.status(200).json({status: 200, data: newBoard});
+                return await res.status(200).json({status: 200, data: newBoard});
             }
             else {
-                res.status(500).json({status: 500, message: "The new board could not be added properly"})
+                return await res.status(500).json({status: 500, message: "The new board could not be added properly"})
             }
 
         }
@@ -467,7 +463,7 @@ const createBoard = async (req, res) => {
     }
     catch(err) {
         console.error("err =", err);
-        res.status(500).json({
+        return res.status(500).json({
             status: 500,
             message: err.message
         });
@@ -487,8 +483,8 @@ const updateBoard = async (req, res) => {
 
     const aBoard = req.body;
 
-    console.log(`aBoard = `, aBoard);
-    console.log(`aBoard._id = `, aBoard._id)
+    // console.log(`aBoard = `, aBoard);
+    console.log(`upateBoard:... aBoard._id = `, aBoard._id)
 
     const {tasks, columns, columnOrder, userIdsWithAccess, boardName} = aBoard;
 
@@ -506,12 +502,13 @@ const updateBoard = async (req, res) => {
             const updateBoardResult = await db.collection("boards").updateOne({_id: `${aBoard._id}`}, {$set:{...aBoard}});
 
             if (updateBoardResult && updateBoardResult.modifiedCount) {
-                res.status(200).json({status:200, board: aBoard});
+                return await res.status(200).json({status:200, board: aBoard});
             }
         }
     }
     catch(err) {
         console.log(err.message);
+        return res.status(500).json({status:500, message:err.message});
     }
     finally {
         client.close();
