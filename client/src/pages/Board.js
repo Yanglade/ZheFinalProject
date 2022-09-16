@@ -7,14 +7,12 @@ import Header from "../components/Header";
 import { Dialog, DialogOverlay, DialogContent } from "@reach/dialog";
 import { usePersistedState } from "../hooks/usePersistedState";
 import "@reach/dialog/styles.css";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
 import {FaPencilAlt} from "react-icons/fa";
 
 const Board = () => {;
-  // const [state, setState] = useState(initialData);
   const [persistedBoardId, setPersistedBoardId] = usePersistedState(-1, "boardId");
-  // const [boardState, setBoardState] = usePersistedState(initialData, "board-1");
   const initialBoardState = {};
   const [boardState, setBoardState] = useState(initialBoardState);
   const [showDialog, setShowDialog] = React.useState(false);
@@ -29,82 +27,91 @@ const Board = () => {;
   const boardRenameDivRef = useRef();
   const editButtonRef = useRef();
   const [isEditing, setIsEditing] = useState(false);
-
-  // const {searchParams} = useSearchParams();
+  const [boardName, setBoardName] = useState();
+  const [boardNameIsUpdating, setBoardNameIsUpdating] = useState(false);
+  const navigate = useNavigate();
 
   console.log(`params.... = `, boardId);
-  // console.log(`searchParams = `, searchParams);
 
-  // useEffect(() => {
-  //     console.log(`state = `, state);
-  // }, [state]);
-  
-
-  // const onDragStart = () => {
-  //   document.body.style.color = "orange";
-  //   document.body.style.transition = "background-color 0.2s ease";
-  // };
-
-  // const updateBoardStates = async (board) => {
-  //   setBoardState(board);
-  //   setPersistedBoardId(board._id);
-  //   if (boardState !== initialBoardState) {
-  //     setLoading(false);
-
-  //   }
-  // }
 
   useEffect(async()=> {
-    console.log("UseEffect8s8s8s88s8s8s8s8s8s88s8");
+    console.log("Board_useEffect_1_boardId");
     setLoading(true);
     const res = await fetch(`/api/get-board/${boardId}`);
     const json = await res.json();
     const {board} = json;
-    // console.log("data==================", board);
-    // console.log("boardState==================", boardState);
+    console.log(`board...userEffect_1 = `, board);
+
     setBoardState(board);
     setPersistedBoardId(board._id);
-    if (boardState !== initialBoardState)
+    if (boardState !== initialBoardState && boardState._id === boardId)
       setLoading(false);
 
-    }, [boardState._id, userState]);
+    }, [boardState._id, boardId]);
+
+    // useEffect(async()=>{
+    //   console.log("Board_useEffect_2_boardName");
+    //   console.log(`boardId = `, boardId);
+    //   console.log(`boardState._id = `, boardState._id);
+    //   console.log('boardState.boardName', boardState.boardName);
+    //   await actions.updateBoard(boardState, userState);
+    //   setBoardNameIsUpdating(true);
+    //   if (boardState.boardName)
+    //     setBoardNameIsUpdating(false);
+    // }, [boardState.boardName])
+
+    // useEffect(async()=> {
+    //   console.log("Board_useEffect_3_boardState");
+    //   setLoading(true);
+    //   await actions.updateBoard(boardState, userState);
+    //   setLoading(false);
+    //   console.log(`boardId = `, boardId);
+    //   console.log(`boardState._id = `, boardState._id);
+    //   console.log('boardState.boardName', boardState.boardName);
+
+    // }, [boardState.tasks, boardState.columns, boardState.columnOrder,  boardState.userIdsWithAccess]);
+
+    useEffect (()=> {
+      console.log("Board_useEffect_4_boardState");
+      setLoading(true);
+      setBoardNameIsUpdating(true);
+      if (boardState._id)
+        actions.updateBoard(boardState, userState);
+      if (boardState !== initialBoardState && boardState._id === boardId)
+        setLoading(false);
+      if (boardState.boardName)
+        setBoardNameIsUpdating(false);
+    }, [boardState]);
 
     const editBoardName = () => {
-      inputBoardRenameRef.current.placeholder = selectBoardRef.current.value;
-      inputBoardRenameRef.current.value = "";
-      selectBoardRef.current.style.display = "none";
-      boardRenameDivRef.current.style.display = "inline";
-      inputBoardRenameRef.current.focus();
-      editButtonRef.current.style.display = "none";
-
+      setIsEditing(true);
     }
 
-    const boardSelection = () => {
-      console.log("boardSelection!!!!!");
-      inputBoardRenameRef.current.placeholder = selectBoardRef.current.value;
-      inputBoardRenameRef.current.value = "";
+    const boardSelection = (e) => {
+      console.log(`Board selection: ${e.target.selectedIndex}`);
+      console.log("boardName", userState.boardsForUser[e.target.selectedIndex].boardName);
+      setBoardState(userState.boardsForUser[e.target.selectedIndex]);
+      navigate(`/board/${userState.boardsForUser[e.target.selectedIndex]._id}`);
     }
 
     const cancelEdit = () => {
-        inputBoardRenameRef.current.placeholder = selectBoardRef.current.value;
+        
+        inputBoardRenameRef.current.placeholder = boardState.boardName;
         inputBoardRenameRef.current.value = "";
-        boardRenameDivRef.current.style.display = "none";
-        selectBoardRef.current.style.display = "inline";
-        editButtonRef.current.style.display = "inline";
+        setIsEditing(false);
+        setBoardName(boardState.boardName);
     }
 
-    const onEnter = (e) => {
+    const onEnter = async (e) => {
       // e.preventDefault();
       e.stopPropagation();
-      // alert(`e.target.value:${e.target.value === ""}...`);
-      //console.log(`e.target.value = `, e.target.value);
+
       if (e.charCode === 13 && e.target.value !== "") {
-        boardRenameDivRef.current.style.display = "none";
-        selectBoardRef.current.style.display = "inline";
-        editButtonRef.current.style.display = "inline";
-        const newBoardState = {...boardState, boardName: e.target.value};
+        setIsEditing(false);
+
+        const newBoardState = {...boardState, boardName: boardName};
         setBoardState(newBoardState);
-        actions.updateBoard(newBoardState, userState);
+        //await actions.updateBoard(newBoardState, userState);
       }
       else if (e.charCode === 13) {
         e.preventDefault();
@@ -229,9 +236,8 @@ const Board = () => {;
     open();
   }
 
-  console.log("boardState.+.+.+" +`loading${loading}`, boardState);
   return (
-    (loading || boardState == initialBoardState) ? (
+    (loading || boardState === initialBoardState) ? (
     <SpinnerWrapper>
       <LoaderDiv>
         <FiLoader />
@@ -241,17 +247,41 @@ const Board = () => {;
     <>
       <Header/>
       <BoardNameSection>
+        {boardNameIsUpdating ? (
+          <>
+            <LoaderDiv>
+              <FiLoader />
+            </LoaderDiv>
+        </>
+        ):(
+        <>
         <BoardNamesLabel htlmfor="boardNames">Boards:</BoardNamesLabel>
-        <SelectBoard ref={selectBoardRef} onChange={boardSelection} name="boardNames" id="boardNames">
-          { 
-            userState.boardsForUser.map(board => <option key={board._id} value={board.boardName}>{board.boardName}</option>)
-          }
-        </SelectBoard>
-        <BoardRenameDiv ref={boardRenameDivRef} >
-          <BoardRenameInput ref={inputBoardRenameRef} onKeyPress={(e)=>onEnter(e)} placeholder={boardState.boardName}/>
-          <CancelEditButton onClick={cancelEdit} title="Cancel rename">X</CancelEditButton>
-        </BoardRenameDiv>
-        <EditButton ref={editButtonRef} onClick={editBoardName} title="Rename the board"><FaPencilAlt/></EditButton>
+        {
+          (!isEditing) ? (
+            <>
+              <SelectBoard ref={selectBoardRef} onChange={(e)=>boardSelection(e)} name="boardNames" id="boardNames">
+                { 
+                  userState.boardsForUser.map(board => {
+                    if (board._id === boardId)
+                      return <option key={board._id} value={board.boardName} selected>{board.boardName}</option>
+                    else
+                      return <option key={board._id} value={board.boardName}>{board.boardName}</option>
+                  })
+                }
+              </SelectBoard>
+              <EditButton ref={editButtonRef} onClick={editBoardName} title="Rename the board"><FaPencilAlt/></EditButton>
+            </>
+          ): (
+            <>
+              <BoardRenameDiv ref={boardRenameDivRef} >
+                <BoardRenameInput ref={inputBoardRenameRef} onChange={(e)=>setBoardName(e.target.value)} onKeyPress={(e)=>onEnter(e)} placeholder={boardState.boardName}  autoFocus/>
+                <CancelEditButton onClick={cancelEdit} title="Cancel rename">X</CancelEditButton>
+              </BoardRenameDiv>
+            </>
+          )
+        }
+        </>
+        )}
       </BoardNameSection>
       <BoardArea>
       <DragDropContext
@@ -379,7 +409,6 @@ const EditButton = styled.div`
 `;
 
 const BoardRenameDiv = styled.div`
-  display: none;
 `;
 
 const BoardRenameInput = styled.input`
