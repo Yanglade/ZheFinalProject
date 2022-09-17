@@ -1,10 +1,12 @@
-import React, {useRef, useState} from "react";
+import React, {useRef, useState, useContext} from "react";
 import styled from "styled-components";
 import { Draggable } from "react-beautiful-dnd";
 import anImage from "../data/YAz_Trello.png";
-import {FaPencilAlt} from "react-icons/fa";
+import {FaAcquisitionsIncorporated, FaPencilAlt} from "react-icons/fa";
 import { Dialog, DialogOverlay, DialogContent } from "@reach/dialog";
 import "@reach/dialog/styles.css";
+import {UserContext} from "../context/UserContext";
+
 
 const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) => {
   console.log(task);
@@ -13,14 +15,19 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
   const [showDialog, setShowDialog] = React.useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalDescription, setModalDescription] = useState("");
+  const {userState, actions} = useContext(UserContext);
+
   const open = () => {
     setShowDialog(true);
     setModalContent(task.content);
     setModalDescription(!task.details?"":!task.details.description?"":task.details.description);
   };
 
-  const close = () => {
+  const close = async() => {
+    const newBoardState = {...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}}
     setBoardState({...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}});
+    await actions.updateBoard(newBoardState, userState);
+    
     setShowDialog(false);
   };
 
@@ -32,13 +39,15 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
     
   // }
 
-  const onEnter = (e) => {
+  const onEnter = async(e) => {
     // e.preventDefault();
     e.stopPropagation();
     // alert(`e.target.value:${e.target.value === ""}...`);
     //console.log(`e.target.value = `, e.target.value);
     if (e.charCode === 13 && e.target.value !== "") {
-      setBoardState({...boardState, tasks:{...boardState.tasks, [task.id]: {...task, named: true, content: e.target.value}}});
+      const newBoardState = {...boardState, tasks:{...boardState.tasks, [task.id]: {...task, named: true, content: e.target.value}}}
+      setBoardState(newBoardState);
+      await actions.updateBoard(newBoardState, userState);
       focusAddTask();
     }
     else if (e.charCode === 13) {
@@ -46,7 +55,7 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
     }
   }
 
-  const deleteNewTask = (e) => {
+  const deleteNewTask = async(e) => {
     e.preventDefault();
     console.log("tasks", boardState.tasks[`"${task.id}"`]);
     const newBoardState = {...boardState}
@@ -55,6 +64,7 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
      newBoardState.columns[column.id].taskIds = newBoardState.columns[column.id].taskIds.filter(aTask => aTask != task.id); //aTask != task.id
      console.log(`boardState = `, newBoardState);
      setBoardState(newBoardState);
+     await actions.updateBoard(newBoardState, userState);
   }
 
   return (

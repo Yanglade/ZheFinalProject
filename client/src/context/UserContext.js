@@ -41,6 +41,19 @@ const reducer = (userState, action) => {
       }
     }
 
+    case 'add-a-board-for-user': {
+      return {
+        email: action.email,
+        picture: action.picture,
+        firstName: action.firstName,
+        lastName: action.lastName,
+        boards: action.boards,
+        initials: action.initials,
+        _id: action._id,
+        boardsForUser: action.boardsForUser
+      }
+    }
+
     default: 
       throw new Error("Unrecognized type")
   }
@@ -49,7 +62,6 @@ const reducer = (userState, action) => {
 const UserProvider = ({children}) => {
   
   const [userState, dispatch] = useReducer(reducer, initialState);
-  const [persistedUser, setPersistedUser] = usePersistedState(userState, "persisted-user");
 
   const testFunction = ()=> {
     const action = {
@@ -108,10 +120,6 @@ const UserProvider = ({children}) => {
           }
 
           userId = data._id;
-
-          setPersistedUser({
-            _id: data._id
-          });
       
           // dispatch(action);
 
@@ -215,11 +223,25 @@ const UserProvider = ({children}) => {
     }
   }
 
+  const addABoardForUser = (board, aUserState) => {
+    
+    const newBoardsForUser = [...aUserState.boardsForUser, board];
+
+    const action = {
+      type: "add-a-board-for-user",
+      ...aUserState,
+      boardsForUser: newBoardsForUser
+    }
+
+    dispatch(action);
+  }
+
   return (
-  <UserContext.Provider value = {{userState, persistedUser, setPersistedUser, actions: {
+  <UserContext.Provider value = {{userState, actions: {
     createUserAndReceiveInfo,
     testFunction,
-    updateBoard
+    updateBoard,
+    addABoardForUser
     }}}>
     {children}
   </UserContext.Provider>

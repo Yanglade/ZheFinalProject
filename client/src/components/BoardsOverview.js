@@ -45,7 +45,7 @@ const BoardOverview = () => {
 
             if (status === 200) {
               const {boards} = json;
-              actions.setBoardsForUser(boards);
+              actions.addABoardForUser(boards, userState);
             }
           }
           catch (err){

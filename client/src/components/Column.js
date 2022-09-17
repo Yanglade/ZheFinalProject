@@ -1,12 +1,14 @@
-import React, {memo, useRef} from "react";
+import React, {memo, useRef, useContext} from "react";
 import styled from "styled-components";
 import {Droppable, Draggable} from "react-beautiful-dnd";
 import Task from "./Task";
 import { Dialog, DialogOverlay, DialogContent } from "@reach/dialog";
 import "@reach/dialog/styles.css";
+import {UserContext} from "../context/UserContext";
 
 const Column = ({column, tasks, isDropDisabled, index, boardState, setBoardState}) => {
 const [showDialog, setShowDialog] = React.useState(false);
+const {userState, actions} = useContext(UserContext);
 const open = () => setShowDialog(true);
 const close = () => setShowDialog(false);
 const addTaskBtnRef = useRef();
@@ -28,7 +30,7 @@ console.log(`Column: ${column.id} = `, tasks);
 
 
 
-  const addTask = () => {
+  const addTask = async() => {
     console.log("in add task");
     const newTaskId = `task-${Object.keys(boardState.tasks).length+1}`;
     const newTask = {id: newTaskId, content: newTaskId, details:{image_url: "../../client/public/favicon.ico"}};
@@ -39,7 +41,10 @@ console.log(`Column: ${column.id} = `, tasks);
 
     //open();
 
-    setBoardState({...boardState, tasks: {...boardState.tasks, [newTaskId]: newTask }, columns: {...boardState.columns, [column.id]: {...column, taskIds: [...column.taskIds, newTaskId]}}});
+    const newBoardState = {...boardState, tasks: {...boardState.tasks, [newTaskId]: newTask }, columns: {...boardState.columns, [column.id]: {...column, taskIds: [...column.taskIds, newTaskId]}}};
+
+    setBoardState(newBoardState);
+    await actions.updateBoard(newBoardState, userState);
   }
 
   const focusAddTask = () => {
@@ -47,20 +52,22 @@ console.log(`Column: ${column.id} = `, tasks);
     addTaskBtnRef.current.focus();
   }
 
-  const onEnter = (e) => {
+  const onEnter = async (e) => {
     // e.preventDefault();
     e.stopPropagation();
     // alert(`e.target.value:${e.target.value === ""}...`);
     //console.log(`e.target.value = `, e.target.value);
     if (e.charCode === 13 && e.target.value !== "") {
-      setBoardState({...boardState, columns:{...boardState.columns, [column.id]: {...column, named: true, title: e.target.value}}});
+      const newBoardState = {...boardState, columns:{...boardState.columns, [column.id]: {...column, named: true, title: e.target.value}}};
+      setBoardState(newBoardState);
+      await actions.updateBoard(newBoardState, userState);
     }
     else if (e.charCode === 13) {
       e.preventDefault();
     }
   }
 
-  const deleteNewColumn = (e) => {
+  const deleteNewColumn = async(e) => {
     e.preventDefault();
     const newBoardState = {...boardState};
      delete boardState.columns[column.id];
@@ -68,6 +75,7 @@ console.log(`Column: ${column.id} = `, tasks);
      newBoardState.columnOrder = newBoardState.columnOrder.filter(aColumn => aColumn != column.id); //aTask != task.id
      console.log(`boardState = `, newBoardState);
      setBoardState(newBoardState);
+     await actions.updateBoard(newBoardState, userState);
   }
 
    return (
