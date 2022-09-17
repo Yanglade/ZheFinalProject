@@ -13,7 +13,10 @@ const {
     getBoardsForUser,
     login,
     createBoard,
-    updateBoard
+    updateBoard,
+    getGeekJoke,
+    getAdvice,
+    getZen
 } = require("./handlers");
 
 
@@ -40,6 +43,10 @@ express()
     .post("/api/add-user", login)
     .post("/api/add-board", createBoard)
     .put("/api/update-board", updateBoard)
+    // .get("https://api.adviceslip.com/advice", getAdvice);
+    .get("https://v2.jokeapi.dev/joke/Programming?format=json&type=single&blacklist=nsfw,racist,sexist,explicit", getGeekJoke)
+    .get("https://api.adviceslip.com/daily_adviceslip.rss", getAdvice)
+    .get("https://zenquotes.io/api/random/3", getZen)
 
 
       // ---------------------------------

@@ -2,6 +2,7 @@ import React, {useEffect, useState, useContext} from "react";
 import styled, {keyframes} from "styled-components";
 import Header from "../components/Header";
 import BoardOverview from "../components/BoardsOverview";
+import Quotes from "../components/Quotes"
 import {UserContext} from "../context/UserContext";
 import { FiLoader } from "react-icons/fi";
 
@@ -29,7 +30,7 @@ const Dashboard = ({logout}) => {
       <DashBoardSections>
         <BoardDiv><BoardOverview/></BoardDiv>
         <WeatherDiv/>
-        <InspirationalDiv/>
+        <InspirationalDiv><Quotes/></InspirationalDiv>
         <OtherDiv/>
       </DashBoardSections>
     </DashBoardWrapper>
