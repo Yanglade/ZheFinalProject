@@ -5,6 +5,7 @@ import BoardOverview from "../components/BoardsOverview";
 import Quotes from "../components/Quotes"
 import {UserContext} from "../context/UserContext";
 import { FiLoader } from "react-icons/fi";
+import DBoardImage  from "../images/Wallpaper.jpg";
 
 
 const Dashboard = ({logout}) => {
@@ -43,6 +44,10 @@ const DashBoardWrapper = styled.div`
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  background-image: url(${DBoardImage});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 `;
 
 const DashBoardSections = styled.div`
@@ -59,7 +64,8 @@ const BoardDiv = styled.div`
   border: 1px solid blue;
   margin: 10px;
   border-radius: 10px;
-  box-shadow: 10px 10px lightgrey; 
+  box-shadow: 10px 10px black; 
+  background-color: white;
 `;
 
 const WeatherDiv = styled.div`
@@ -68,7 +74,8 @@ const WeatherDiv = styled.div`
   border: 1px solid blue;
   margin: 10px;
   border-radius: 10px;
-  box-shadow: 10px 10px lightgrey; 
+  box-shadow: 10px 10px black;
+  background-color: white; 
 `;
 
 const InspirationalDiv = styled.div`
@@ -78,7 +85,8 @@ const InspirationalDiv = styled.div`
   margin: 10px;
   margin: 10px;
   border-radius: 10px;
-  box-shadow: 10px 10px lightgrey; 
+  box-shadow: 10px 10px black;
+  background-color: white; 
 `;
 
 const OtherDiv = styled.div`
@@ -87,7 +95,8 @@ const OtherDiv = styled.div`
   border: 1px solid blue;
   margin: 10px;
   border-radius: 10px;
-  box-shadow: 10px 10px lightgrey; 
+  box-shadow: 10px 10px black; 
+  background-color: white;
 `;
 
 const rotate = keyframes`

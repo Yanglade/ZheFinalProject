@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require("uuid");
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 const { MONGO_URI } = process.env;
+const fetch = require("node-fetch");
 
 const options = {
     useNewUrlParser: true,
@@ -518,7 +519,7 @@ const updateBoard = async (req, res) => {
 const getGeekJoke = async () => {
     // ha hahahh
     try {
-      const response = await request("https://v2.jokeapi.dev/joke/Programming?format=json&type=single&blacklist=nsfw,racist,sexist,explicit");
+      const response = await fetch("https://v2.jokeapi.dev/joke/Programming?format=json&type=single&blacklist=nsfw,racist,sexist,explicit");
       const parsedResponse = await JSON.parse(response);
       //console.log(parsedResponse);
       return parsedResponse.joke;
@@ -531,7 +532,7 @@ const getGeekJoke = async () => {
 const getAdvice = async () => {
     // ha hahahh
     try {
-        const response = await request("https://api.adviceslip.com/daily_adviceslip.rss");
+        const response = await fetch("https://api.adviceslip.com/daily_adviceslip.rss");
         const parsedResponse = await JSON.parse(response);
         console.log(parsedResponse);
         return res.status(200).json({status:200, data: parsedResponse});
@@ -541,12 +542,13 @@ const getAdvice = async () => {
     }
 };
 
-const getZen = async () => {
+const getZen = async (req, res) => {
     try {
-        const response = await request("https://zenquotes.io/api/random/3");
-        const parsedResponse = await JSON.parse(response);
-        //console.log(parsedResponse);
-        return parsedResponse;
+        const response = await fetch("https://zenquotes.io/api/random/3");
+        const parsedResponse = await response.json();
+        console.log("parsedResponse....", parsedResponse);
+        // return parsedResponse;
+        return await res.status(200).json({status:200, data: parsedResponse});
     }
     catch(err) {
     console.log(err);
