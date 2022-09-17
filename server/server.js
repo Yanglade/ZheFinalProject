@@ -47,6 +47,7 @@ express()
     .get("https://v2.jokeapi.dev/joke/Programming?format=json&type=single&blacklist=nsfw,racist,sexist,explicit", getGeekJoke)
     .get("https://api.adviceslip.com/daily_adviceslip.rss", getAdvice)
     .get("https://zenquotes.io/api/random/3", getZen)
+    .get("/zen", getZen)
 
 
       // ---------------------------------

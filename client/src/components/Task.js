@@ -16,16 +16,18 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
   const [modalContent, setModalContent] = useState("");
   const [modalDescription, setModalDescription] = useState("");
   const {userState, actions} = useContext(UserContext);
+  const [modalComments, setModalComments] = useState([]);
 
   const open = () => {
     setShowDialog(true);
     setModalContent(task.content);
     setModalDescription(!task.details?"":!task.details.description?"":task.details.description);
+    setModalComments(!task.details?"":!task.details.comments?"":task.details.comments);
   };
 
   const close = async() => {
-    const newBoardState = {...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}}
-    setBoardState({...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}});
+    const newBoardState = {...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription, comments: modalComments}}}};
+    setBoardState(newBoardState);
     actions.updateBoard(newBoardState, userState);
     
     setShowDialog(false);
@@ -65,6 +67,25 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
      console.log(`boardState = `, newBoardState);
      setBoardState(newBoardState);
      await actions.updateBoard(newBoardState, userState);
+  }
+
+  const formatComment = (str) => {
+    const newComment = `<div style={{width="95%"}}><div style="{{borderRadius="50%",backgroundColor="green", color:"white"}}"> ${userState.initials}</div>${str}</div>`;
+    return newComment;
+  }
+
+  const onCommentsEnter = async(e) => {
+    // e.preventDefault();
+    e.stopPropagation();
+    // alert(`e.target.value:${e.target.value === ""}...`);
+    //console.log(`e.target.value = `, e.target.value);
+    if (e.charCode === 13 && e.target.value !== "") {
+      const newComments = [...modalComments,formatComment(e.target.value) ];
+      setModalComments(newComments);
+    }
+    else if (e.charCode === 13) {
+      e.preventDefault();
+    } 
   }
 
   return (
@@ -110,7 +131,7 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
       )}
     </Draggable>
     <DialogOverlay
-      style={{ background: "hsla(0, 100%, 100%, 0.5)", width: "80vw" }}
+      style={{ background: "hsla(0, 100%, 100%, 0.5)", width: "100vw" }}
       isOpen={showDialog}
       onDismiss={close}
     >
@@ -120,7 +141,7 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
                 border: "solid 3px hsla(0, 0%, 0%, 0.5)", 
                 borderRadius: "10px",
                 width: "30vw",
-                height: "50vh"
+                height: "80vh"
               }}
         content={task.content}
       >
@@ -131,11 +152,12 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
           <div style={{display:"flex", flexDirection:"column", justifyContent:"space-between", height:"100%"}}>
             <h4> Task Name</h4>
             {/* <input style={{width:"200px", height:"50px"}} placeholder="Task Name" type="text" name="taskName" required autoComplete="off" value={modalValue} onChange={(e)=>{setModalValue(e.target.value)}}/> */}
-            <input style={{width:"200px", height:"50px"}} placeholder="Task Name" type="text" name="taskName" required autoComplete="off" value={modalContent} onChange={(e)=>{setModalContent(e.target.value)}}/>
+            <input style={{width:"300px", height:"30px"}} placeholder="Task Name" type="text" name="taskName" required autoComplete="off" value={modalContent} onChange={(e)=>{setModalContent(e.target.value)}}/>
             <h4> Description</h4>
-            <textarea style={{height:"300px"}} placeholder="description..." type="text" name="typeDescripton" value={modalDescription} onChange={(e)=>{setModalDescription(e.target.value)}}/>
-            <h4> Activity</h4>
-            <input style={{height:"100px"}} placeholder="write a comment..." type="text" name="typeComment"/>
+            <textarea style={{height:"150px"}} placeholder="description..." type="text" name="typeDescripton" value={modalDescription} onChange={(e)=>{setModalDescription(e.target.value)}}/>
+            <h4>Comments</h4>
+            <div style={{height: "300px", border: "1px solid grey", marginBottom:"3px"}}>{modalComments.map(item=><div key={`${Math.random()*1000}`}>{item}</div>)}</div>
+            <input style={{height: "75px"}} onKeyPress={(e)=>onCommentsEnter(e)} placeholder="write a comment..." type="text" name="typeComment"/>
           </div>
         </form>
 

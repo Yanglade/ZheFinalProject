@@ -11,6 +11,7 @@ import { usePersistedState } from "../hooks/usePersistedState";
 import "@reach/dialog/styles.css";
 import {useParams} from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
+import BoardImage  from "../images/BoardBackground.jpg";
 
 const Board = () => {;
   // const [persistedBoardId, setPersistedBoardId] = usePersistedState(-1, "boardId");
@@ -277,6 +278,10 @@ const Board = () => {;
 
 const BoardArea = styled.div`
   display: flex;
+  /* background-image: url(${BoardImage});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover; */
 `;
 
 const Container = styled.div`

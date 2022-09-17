@@ -4,30 +4,31 @@ import { FiLoader } from "react-icons/fi";
 
 
 const Quotes = () => {
-  const [quote, setQuote] = useState({});
+  const [quote, setQuote] = useState([]);
   const [loading, setLoading] = useState();
 
   const getQuote = async () => {
     // const proxyurl = "https://cors-anywhere.herokuapp.com/";
     // const res = await fetch(proxyurl + "https://zenquotes.io/api/random/3");
-    const res = await fetch("https://zenquotes.io/api/random/3",  {mode: "no-cors"});
+    const res = await fetch("/zen");
     const json = await res.json();
+    console.log({json})
     const {data} = json;
-    console.log(`data = `, data.data.parsedResponse);
-    setQuote(data.data.parsedResponse);
+    console.log(`data = `, data[0]);
+    setQuote(data[0]);
   }
 
-  useEffect(()=> {
+  useEffect(async()=> {
     setLoading(true)
-    getQuote();
-    if (quote !== {})
+    await getQuote();
+    if (quote)
       setLoading(false);
 
     console.log(`quote = `, quote);
   }, []) //[quote]
 
   return (
-    loading ? (
+    (loading || quote === undefined)? (
       <QuotesWrapper>
         <SpinnerWrapper>
           <LoaderDiv>
@@ -38,7 +39,9 @@ const Quotes = () => {
       ): (
       <QuotesWrapper>
         <TitleDiv style={{fontWeight: "bold", textAlign:"center"}}>Quote</TitleDiv>
-        <div></div>
+        <div>{quote.q}</div>
+        <div>{quote.a}</div>
+        <button style={{width:"100px", height:"30px", alignSelf:"center"}} onClick={()=>getQuote()}>New quote</button>
       </QuotesWrapper>
       )
   )
