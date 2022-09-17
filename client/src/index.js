@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Auth0Provider } from "@auth0/auth0-react";
 import UserProvider from "./context/UserContext";
+import BoardProvider from "./context/BoardContext";
 
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -22,7 +23,9 @@ ReactDOM.render(
       redirectUri={window.location.origin}
     >
       <UserProvider>
+      <BoardProvider>
           <App />
+      </BoardProvider>
       </UserProvider>
     </Auth0Provider>
   </React.StrictMode>,
