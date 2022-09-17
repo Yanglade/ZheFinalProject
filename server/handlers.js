@@ -475,7 +475,7 @@ const createBoard = async (req, res) => {
 }
 
 /**********************************************************/
-/*  createBoard: returns a list of all boards
+/*  updateBoard: returns a list of all boards
 /**********************************************************/
 const updateBoard = async (req, res) => {
     const client = new MongoClient(MONGO_URI, options);
@@ -515,6 +515,46 @@ const updateBoard = async (req, res) => {
     }
 }
 
+const getGeekJoke = async () => {
+    // ha hahahh
+    try {
+      const response = await request("https://v2.jokeapi.dev/joke/Programming?format=json&type=single&blacklist=nsfw,racist,sexist,explicit");
+      const parsedResponse = await JSON.parse(response);
+      //console.log(parsedResponse);
+      return parsedResponse.joke;
+    }
+    catch(err) {
+      console.log(err);
+    }
+  };
+
+const getAdvice = async () => {
+    // ha hahahh
+    try {
+        const response = await request("https://api.adviceslip.com/daily_adviceslip.rss");
+        const parsedResponse = await JSON.parse(response);
+        console.log(parsedResponse);
+        return res.status(200).json({status:200, data: parsedResponse});
+    }
+    catch(err) {
+        console.log(err);
+    }
+};
+
+const getZen = async () => {
+    try {
+        const response = await request("https://zenquotes.io/api/random/3");
+        const parsedResponse = await JSON.parse(response);
+        //console.log(parsedResponse);
+        return parsedResponse;
+    }
+    catch(err) {
+    console.log(err);
+    }
+};
+
+
+
 module.exports = {
   getUsers,
   getUserById,
@@ -524,5 +564,8 @@ module.exports = {
   getBoardsForUser,
   login,
   createBoard,
-  updateBoard
+  updateBoard,
+  getGeekJoke,
+  getAdvice,
+  getZen
 };

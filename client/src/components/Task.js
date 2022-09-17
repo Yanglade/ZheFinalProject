@@ -26,7 +26,7 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
   const close = async() => {
     const newBoardState = {...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}}
     setBoardState({...boardState, tasks: {...boardState.tasks, [task.id]: {...task, content: modalContent, details: {...task.details, description: modalDescription}}}});
-    await actions.updateBoard(newBoardState, userState);
+    actions.updateBoard(newBoardState, userState);
     
     setShowDialog(false);
   };

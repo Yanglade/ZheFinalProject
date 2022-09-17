@@ -11,6 +11,7 @@ import {useContext, useEffect} from "react";
 import {UserContext} from "./context/UserContext";
 import styled, {keyframes} from "styled-components";
 import { FiLoader } from "react-icons/fi";
+import WipImage from "../src/images/WIP.png";
 
 const App = () => {
 
@@ -36,13 +37,13 @@ const App = () => {
     isLoading ? (
     <SpinnerWrapper>
       <LoaderDiv>
-        App-isLoading<FiLoader />
+        <FiLoader />
       </LoaderDiv>
     </SpinnerWrapper>
     ):
     !isAuthenticated ?
       <LoginWrapper>
-        <LoginButton onClick={()=>loginWithRedirect()}>Login</LoginButton>
+        <LoginButton  onClick={()=>loginWithRedirect()}>Login</LoginButton>
       </LoginWrapper>
       : (
         <BrowserRouter>
@@ -73,14 +74,23 @@ const LoginWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: black;
+  /* background-color: white; */
+  position: relative;
+  background-image: url(${WipImage});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  object-fit: contain;
 `;
 
 const LoginButton = styled.button`
-    width: 50px;
-    height: 30px;
+    width: 120px;
+    height: 60px;
     background-color: white;
     color: black;
+    font-size: 30px;
+    border-radius: 5px;
+    box-shadow: 10px 10px black; 
     &:hover {
     cursor: pointer;
   }

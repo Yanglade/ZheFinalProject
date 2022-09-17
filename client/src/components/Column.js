@@ -167,8 +167,8 @@ export default Column;
 
 const Container = styled.div`
   margin: 8px;
-  border: 1px solid lightgrey;
-  background-color: white;
+  border: 3px solid lightgrey;
+  background-color: gold;
   border-radius: 2px;
   width: 220px;
   display: flex;
