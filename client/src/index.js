@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Auth0Provider } from "@auth0/auth0-react";
+import UserProvider from "./context/UserContext";
+import BoardProvider from "./context/BoardContext";
+
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));
 // root.render(
@@ -13,7 +17,17 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-      <App />
+    <Auth0Provider 
+      domain= {process.env.REACT_APP_DOMAIN} //"dev-qnlaia4l.us.auth0.com"
+      clientId= {process.env.REACT_APP_CLIENT_ID} //"x3drZaEn8agYYg49vHIm5G0JdmygY3QG"
+      redirectUri={window.location.origin}
+    >
+      <UserProvider>
+      <BoardProvider>
+          <App />
+      </BoardProvider>
+      </UserProvider>
+    </Auth0Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );
