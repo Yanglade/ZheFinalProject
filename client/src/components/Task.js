@@ -156,7 +156,7 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
             <h4> Description</h4>
             <textarea style={{height:"150px"}} placeholder="description..." type="text" name="typeDescripton" value={modalDescription} onChange={(e)=>{setModalDescription(e.target.value)}}/>
             <h4>Comments</h4>
-            <div style={{height: "300px", border: "1px solid grey", marginBottom:"3px"}}>{modalComments.map(item=><div key={`${Math.random()*1000}`}>{item}</div>)}</div>
+            <div style={{height: "300px", border: "1px solid grey", marginBottom:"3px"}} value={modalComments}>{modalComments}</div>
             <input style={{height: "75px"}} onKeyPress={(e)=>onCommentsEnter(e)} placeholder="write a comment..." type="text" name="typeComment"/>
           </div>
         </form>
