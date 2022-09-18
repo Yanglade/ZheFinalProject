@@ -9,7 +9,6 @@ import {UserContext} from "../context/UserContext";
 
 
 const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) => {
-  console.log(task);
   const isDragDisabled = !(task.named !== undefined && task.named === true); //condition for a task to be draggable
   const taskNameRef = useRef();
   const [showDialog, setShowDialog] = React.useState(false);
@@ -33,19 +32,9 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
     setShowDialog(false);
   };
 
-
-  // const setTaskName = (e) => {
-  //   e.preventDefault();
-  //   alert("wow");
-  //   console.log("state", state);
-    
-  // }
-
   const onEnter = async(e) => {
-    // e.preventDefault();
     e.stopPropagation();
-    // alert(`e.target.value:${e.target.value === ""}...`);
-    //console.log(`e.target.value = `, e.target.value);
+
     if (e.charCode === 13 && e.target.value !== "") {
       const newBoardState = {...boardState, tasks:{...boardState.tasks, [task.id]: {...task, named: true, content: e.target.value}}}
       setBoardState(newBoardState);
@@ -59,12 +48,10 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
 
   const deleteNewTask = async(e) => {
     e.preventDefault();
-    console.log("tasks", boardState.tasks[`"${task.id}"`]);
     const newBoardState = {...boardState}
      delete boardState.tasks[task.id];
 
-     newBoardState.columns[column.id].taskIds = newBoardState.columns[column.id].taskIds.filter(aTask => aTask != task.id); //aTask != task.id
-     console.log(`boardState = `, newBoardState);
+     newBoardState.columns[column.id].taskIds = newBoardState.columns[column.id].taskIds.filter(aTask => aTask != task.id);
      setBoardState(newBoardState);
      await actions.updateBoard(newBoardState, userState);
   }
@@ -75,10 +62,8 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
   }
 
   const onCommentsEnter = async(e) => {
-    // e.preventDefault();
     e.stopPropagation();
-    // alert(`e.target.value:${e.target.value === ""}...`);
-    //console.log(`e.target.value = `, e.target.value);
+   
     if (e.charCode === 13 && e.target.value !== "") {
       const newComments = [...modalComments,formatComment(e.target.value) ];
       setModalComments(newComments);
@@ -99,7 +84,6 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
         <Container
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          // innerRef={provided.innerRef} /*deprecated*/
           ref={provided.innerRef}
           isDragging={snapshot.isDragging}
           isDragDisabled={isDragDisabled} //to allow style for a non draggable task
@@ -107,7 +91,6 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
           {/* <Handle {...provided.dragHandleProps}/> */}
           {task.id === task.content ? (
             <form style={{width:"100%"}} onSubmit={(e)=> e.preventDefault()}>
-            {/* <> */}
               <input
                 ref={taskNameRef}
                 style={{ height: "40px", border:"none", width: "98%", paddingLeft:"5px" }}
@@ -118,7 +101,6 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
                 autoFocus
               />
               <button style={{color:"grey", width:"15px", display:"flex", justifyContent:"center", marginTop:"5px"}} onClick={(e)=>deleteNewTask(e)}>X</button>
-              {/* </> */}
             </form>
           ) : (
             <TaskDiv style={{display:"flex", justifyContent:"stretch", position:"relative", width:"100%", backgroundColor:"inherit"}}>
@@ -151,7 +133,6 @@ const Task = ({ task, index, boardState, setBoardState, column, focusAddTask }) 
         <form style={{height:"80%"}}>
           <div style={{display:"flex", flexDirection:"column", justifyContent:"space-between", height:"100%"}}>
             <h4> Task Name</h4>
-            {/* <input style={{width:"200px", height:"50px"}} placeholder="Task Name" type="text" name="taskName" required autoComplete="off" value={modalValue} onChange={(e)=>{setModalValue(e.target.value)}}/> */}
             <input style={{width:"300px", height:"30px"}} placeholder="Task Name" type="text" name="taskName" required autoComplete="off" value={modalContent} onChange={(e)=>{setModalContent(e.target.value)}}/>
             <h4> Description</h4>
             <textarea style={{height:"150px"}} placeholder="description..." type="text" name="typeDescripton" value={modalDescription} onChange={(e)=>{setModalDescription(e.target.value)}}/>
@@ -211,12 +192,5 @@ const TaskDiv = styled.div`
   }
 `;
 
-// const Handle = styled.div`
-//   width: 20px;
-//   height: 20px;
-//   background-color: orange;
-//   border-radius: 4px;
-//   margin-right: 8px;
-// `;
 
 export default Task;

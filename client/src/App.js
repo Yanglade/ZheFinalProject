@@ -1,6 +1,5 @@
 import './App.css';
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-// import DragDrop from "../src/pages/DragDrop";
 import Board from "./pages/Board";
 import Treeview from "../src/pages/Treeview";
 import Inspirational from "../src/pages/Inspirational";
@@ -19,20 +18,12 @@ const App = () => {
 
   const {userState, actions: {createUserAndReceiveInfo}} = useContext(UserContext);
 
-  
-  // console.log(`user from Auth0 = `, userFromAuth0);
-  console.log('user from mongodb in App', userState );
-  // console.log(`isAuthenticated = `, isAuthenticated);
-  // console.log(`error = `, error);
-
   useEffect(()=> {
     if (userFromAuth0) {
-      console.log(`userFromAuth0 in App = `, userFromAuth0);
       createUserAndReceiveInfo(userFromAuth0)
     }
   }, [userFromAuth0])
 
-  console.log(`isLoading = `, isLoading);
   return (
     isLoading ? (
     <SpinnerWrapper>
@@ -74,7 +65,6 @@ const LoginWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background-color: white; */
   position: relative;
   background-image: url(${WipImage});
   background-position: center;
@@ -111,8 +101,6 @@ const LoaderDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 100%;
-  height: 100%; */
   animation: ${rotate} infinite 4s linear;
 `;
 

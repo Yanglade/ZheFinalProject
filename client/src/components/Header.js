@@ -7,10 +7,7 @@ import {UserContext} from "../context/UserContext";
 
 const Header = ({logout}) => {  
 
-  // const {logout} = useAuth0();
   const {userState} = useContext(UserContext);
-
-  console.log(`userState.............................. = `, userState);
 
   return (
     <Wrapper>

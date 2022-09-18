@@ -25,8 +25,6 @@ const getUsers = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const dbName = "finalProject";
 
-  console.log("in get users....");
-
   try {
       // connect...
       await client.connect();
@@ -39,14 +37,7 @@ const getUsers = async (req, res) => {
       if (!collectionExists)
           throw new Error('user collection does not exist');
 
-    console.log("users", await db.collection("users").find().toArray());   
-    
     const usersArray = await db.collection("users").find().toArray();
-
-    //   const usersArray =  ((await db.collection("users").find().toArray()).map(aUser => {
-    //       const {user} = aUser;
-    //       return {user};
-    //   }));
 
       if (usersArray.length > 0) {
 
@@ -75,8 +66,6 @@ const getUserById = async (req, res) => {
 
     const {_id} = req.params;
   
-    console.log("in get users....:", _id);
-  
     try {
         // connect...
         await client.connect();
@@ -89,10 +78,7 @@ const getUserById = async (req, res) => {
         if (!collectionExists)
             throw new Error('user collection does not exist');
   
-      console.log("user", await db.collection("users").findOne({_id}));   
-      
-      const result = await db.collection("users").findOne({_id});
-  
+        const result = await db.collection("users").findOne({_id});
   
         if (result) {
   
@@ -122,8 +108,6 @@ const getUserByEmail = async (req, res) => {
 
     const {email} = req.params;
   
-    console.log("in get users....:", email);
-  
     try {
         // connect...
         await client.connect();
@@ -134,9 +118,7 @@ const getUserByEmail = async (req, res) => {
         const collectionExists = collections.some(c => c.name === "users");
   
         if (!collectionExists)
-            throw new Error('user collection does not exist');
-  
-      console.log("user", await db.collection("users").findOne({email}));   
+            throw new Error('user collection does not exist');  
       
       const result = await db.collection("users").findOne({email});
   
@@ -255,8 +237,6 @@ const getBoardsForUser = async (req, res) => {
     const dbName = "finalProject";
     const {userId} = req.params;
 
-    console.log(`getBoardsForUser param: userId = `, userId);
-
     try {
         // connect...
         await client.connect();
@@ -279,13 +259,7 @@ const getBoardsForUser = async (req, res) => {
 
             const userBoardsIdsArr = user.boards;
 
-            console.log(`getBoardsForUser...user = `, user);
-
-            console.log(`getBoardsForUser...userBoardsIdsArr = `, userBoardsIdsArr);
-
             const userBoardsArr = await db.collection("boards").find({_id: { $in: userBoardsIdsArr}}).toArray();
-
-            // console.log(`getBoardsForUser...userBoardsArr = `, userBoardsArr);
 
             if (userBoardsArr) {
 
@@ -332,8 +306,6 @@ const login = async (req, res) => { //login
 
     const {given_name: firstName, family_name: lastName, email, picture} = body;
 
-    console.log(`body = `, req.body);
-
     try {
         // connect...
         await client.connect();
@@ -348,19 +320,15 @@ const login = async (req, res) => { //login
                 let dbUser = null;
 
                 if (collectionExists) {
-                    console.log("doing find one...");
                     dbUser = await db.collection("users").findOne({email});
                 }
 
-                console.log(`dbUser = `, dbUser);
 
                 if (dbUser) {
-                    console.log(`login...dbUser = `, dbUser)
                     return res.status(200).json({status:200, data:dbUser})
                 }
                 else {
                     const newUser = {_id: uuidv4(), firstName, lastName, email, picture, initials: `${firstName.slice(0,1)}${lastName.slice(0,1)}`, boards:[]}
-                    console.log("doing insertOne..."+`${firstName.slice(0,1)}${lastName.slice(0,1)}`) ;
                     const insertResult = await db.collection("users").insertOne(newUser);
 
                     if (insertResult && insertResult.acknowledged)
@@ -395,8 +363,6 @@ const createBoard = async (req, res) => {
 
     const {tasks, columns, columnOrder, userIdsWithAccess, boardName} = aBoard;
 
-    console.log(`createBoard...aBoard = `, aBoard);
-
     try {
         // connect...
         await client.connect();
@@ -415,9 +381,7 @@ const createBoard = async (req, res) => {
             //check number of boards if collection exists
             if (boardsCollectionExists) {
                 boardCount = await db.collection("boards").countDocuments();
-                console.log(`createBoard...boardCount = `, boardCount);
                 boardId = boardCount + 1;
-                console.log(`createBoard...boardId = `, boardId);
             }
 
             if (!boardName) {
@@ -429,7 +393,6 @@ const createBoard = async (req, res) => {
             }
 
             //insert the new board
-            console.log(`newBoard...before insert = `, newBoard);
             const insertBoardResult = await db.collection("boards").insertOne(newBoard);
 
             if (insertBoardResult && insertBoardResult.acknowledged) {
@@ -437,10 +400,7 @@ const createBoard = async (req, res) => {
                 //update user to add new board
                 if (usersCollectionExists) {
                     const boardUserId = `${userIdsWithAccess[0]}`;
-                    console.log(`boardUserId = `, boardUserId);
                     const boardUser = await db.collection("users").findOne({_id: boardUserId});
-                    console.log(`boardUser = `, boardUser);
-                    console.log(`boardUser.boards = `, boardUser.boards);
                     
                     if (boardUser) {
                         const updatedBoardsArr = [...boardUser.boards, `${boardId}`];
@@ -470,7 +430,6 @@ const createBoard = async (req, res) => {
         });
     }
     finally {
-        console.log("closing");
         client.close();
     }
 }
@@ -483,9 +442,6 @@ const updateBoard = async (req, res) => {
     const dbName = "finalProject";
 
     const aBoard = req.body;
-
-    // console.log(`aBoard = `, aBoard);
-    console.log(`upateBoard:... aBoard._id = `, aBoard._id)
 
     const {tasks, columns, columnOrder, userIdsWithAccess, boardName} = aBoard;
 
@@ -508,7 +464,6 @@ const updateBoard = async (req, res) => {
         }
     }
     catch(err) {
-        console.log(err.message);
         return res.status(500).json({status:500, message:err.message});
     }
     finally {
@@ -521,7 +476,6 @@ const getGeekJoke = async () => {
     try {
       const response = await fetch("https://v2.jokeapi.dev/joke/Programming?format=json&type=single&blacklist=nsfw,racist,sexist,explicit");
       const parsedResponse = await JSON.parse(response);
-      //console.log(parsedResponse);
       return parsedResponse.joke;
     }
     catch(err) {
@@ -534,7 +488,6 @@ const getAdvice = async () => {
     try {
         const response = await fetch("https://api.adviceslip.com/daily_adviceslip.rss");
         const parsedResponse = await JSON.parse(response);
-        console.log(parsedResponse);
         return res.status(200).json({status:200, data: parsedResponse});
     }
     catch(err) {
@@ -546,7 +499,6 @@ const getZen = async (req, res) => {
     try {
         const response = await fetch("https://zenquotes.io/api/random/3");
         const parsedResponse = await response.json();
-        console.log("parsedResponse....", parsedResponse);
         // return parsedResponse;
         return await res.status(200).json({status:200, data: parsedResponse});
     }
