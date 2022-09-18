@@ -10,15 +10,7 @@ const BoardOverview = () => {
   const {userState, actions} = useContext(UserContext);
   const [loading, setLoading] = useState();
 
-  console.log(`state in BoardsOverview = `, userState);
-
   const createNewBoard = async () => {
-
-  console.log(`createNewBoard...initialData = `, initialData);
-  console.log(`createNewBoard...state = `, userState);
-  console.log("createNewBoard...boardsForUser", userState.boardsForUser);
-  console.log("createNewBoard...userState.boardsForUser", userState.boardsForUser);
-  console.log("createNewBoard...userState._id", userState._id);
 
     const postOptions = {
       method: "POST",
@@ -34,7 +26,6 @@ const BoardOverview = () => {
       const json = await res.json();
       
         const {status} = json;
-        // console.log(`status = `, status);
         if (status === 200) {
           const {data} = json;
 
@@ -51,7 +42,6 @@ const BoardOverview = () => {
           catch (err){
             console.log(err.message);
           }
-          console.log(`data in create new board = `, data);
         }
     }
     catch(err) {
@@ -87,7 +77,6 @@ const BoardOverview = () => {
               {
                 userState.boardsForUser.map(board => {
                   return <NavLink key={board._id} to={`/board/${board._id}`}>{board.boardName}</NavLink>
-                  // return <NavLink key={board._id} to={`/board/1`}>{board.boardName}</NavLink>
                 })
               }
             </BoardsList>
@@ -166,8 +155,6 @@ const LoaderDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 100%;
-  height: 100%; */
   animation: ${rotate} infinite 4s linear;
 `;
 
