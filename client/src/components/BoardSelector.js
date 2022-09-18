@@ -31,8 +31,6 @@ const BoardSelector = ({boardId}) => {
   }
 
   const boardSelection = (e) => {
-    console.log(`Board selection: ${e.target.selectedIndex}`);
-    console.log("boardName", userState.boardsForUser[e.target.selectedIndex].boardName);
     setBoardState(userState.boardsForUser[e.target.selectedIndex]);
     navigate(`/board/${userState.boardsForUser[e.target.selectedIndex]._id}`);
   }
@@ -46,7 +44,6 @@ const BoardSelector = ({boardId}) => {
   }
 
   const onEnter = async (e) => {
-    // e.preventDefault();
     e.stopPropagation();
 
     if (e.charCode === 13 && e.target.value !== "") {
@@ -127,8 +124,6 @@ const LoaderDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 100%;
-  height: 100%; */
   animation: ${rotate} infinite 4s linear;
 `;
 
@@ -151,15 +146,11 @@ const SelectBoard = styled.select`
 `;
 
 const EditButton = styled.div`
-  /* position:absolute; 
-  top:-6px;
-  left:95%; */
   color:black;
   width:15px;
   border:none; 
   background-color:inherit;
   margin-left: 20px;
-  /* display:none; */
   &:hover{
     cursor: pointer;
   }
@@ -171,7 +162,6 @@ const BoardRenameDiv = styled.div`
 const BoardRenameInput = styled.input`
   width: 200px;
   height: 24px;
-  /* display: none; */
   padding-left: 5px;
 `;
 

@@ -13,10 +13,8 @@ import {useParams} from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
 import BoardImage  from "../images/BoardBackground.jpg";
 
-const Board = () => {;
-  // const [persistedBoardId, setPersistedBoardId] = usePersistedState(-1, "boardId");
+const Board = () => {
   const initialBoardState = {};
-  // const [boardState, setBoardState] = useState(initialBoardState);
   const {boardState, setBoardState} = useContext(BoardContext);
   const {userState, actions} = useContext(UserContext);
   const [showDialog, setShowDialog] = React.useState(false);
@@ -26,75 +24,29 @@ const Board = () => {;
   const {boardId} = useParams();
   const [loading, setLoading] = useState(true);
 
-  console.log(`params.... = `, boardId);
-
 
   useEffect(()=> {
-    console.log(`Board_useEffect_1_${boardId}`);
-    // setLoading(true);
-    //async
-    // const res = await fetch(`/api/get-board/${boardId}`);
-    // const json = await res.json();
-    // const {board} = json;
-    // setBoardState(board);
-    // setPersistedBoardId(board._id);
-
     if (boardId) {
-      console.log(`boradId before fetch = `, boardId);
       fetch(`/api/get-board/${boardId}`)
       .then((res) => res.json())
       .then((data)=> {
-          console.log(`board...userEffect_1 = `, data.board);
           setBoardState(data.board);
       });
     }
+  }, [boardState._id, boardId]);
 
-
-
-    // if (boardState !== initialBoardState && boardState._id === boardId)
-    //   setLoading(false);
-
-    }, [boardState._id, boardId]);
-
-    // useEffect(async()=>{
-    //   console.log("Board_useEffect_2_boardName");
-    //   console.log(`boardId = `, boardId);
-    //   console.log(`boardState._id = `, boardState._id);
-    //   console.log('boardState.boardName', boardState.boardName);
-    //   await actions.updateBoard(boardState, userState);
-    //   setBoardNameIsUpdating(true);
-    //   if (boardState.boardName)
-    //     setBoardNameIsUpdating(false);
-    // }, [boardState.boardName])
-
-    // useEffect(async()=> {
-    //   console.log("Board_useEffect_3_boardState");
-    //   setLoading(true);
-    //   await actions.updateBoard(boardState, userState);
-    //   setLoading(false);
-    //   console.log(`boardId = `, boardId);
-    //   console.log(`boardState._id = `, boardState._id);
-    //   console.log('boardState.boardName', boardState.boardName);
-
-    // }, [boardState.tasks, boardState.columns, boardState.columnOrder,  boardState.userIdsWithAccess]);
-
-    useEffect (()=> {
-      console.log(`Board_useEffect_4_boardState: ${boardState._id}`);
-      console.log(`loading ${loading}`);
-      if (boardState && boardState._id && boardState.id != undefined)
-        actions.updateBoard(boardState, userState);
-      
-      console.log(`useEffect_4_boardState = `, boardState);
-      if (boardState !== initialBoardState && boardState.boardName  && boardState.columns && boardState.tasks && boardState._id === boardId && boardState.columnOrder) {
-        setLoading(false);
-        console.log("loading false");
-      }
-    }, [boardState]);
+  useEffect (()=> {
+    if (boardState && boardState._id && boardState.id != undefined)
+      actions.updateBoard(boardState, userState);
+    
+    if (boardState !== initialBoardState && boardState.boardName  && boardState.columns && boardState.tasks && boardState._id === boardId && boardState.columnOrder) {
+      setLoading(false);
+    }
+  }, [boardState]);
       
 
   const onDragStart = async start => {
     const homeIndex = boardState.columnOrder.indexOf(start.source.droppableId);
-    console.log("homeIndex", homeIndex);
 
     const newBoardState = {...boardState, homeIndex}; 
     setBoardState(newBoardState);
@@ -150,7 +102,6 @@ const Board = () => {;
       return;
     }
 
-    // const column = boardState.columns[source.droppableId];
     const start = boardState.columns[source.droppableId];
     const finish = boardState.columns[destination.droppableId];
 
@@ -205,7 +156,6 @@ const Board = () => {;
   };
 
   const addColumn = async () => {
-    console.log("in add column");
     const newColumnId = `column-${Object.keys(boardState.columnOrder).length+1}`;
     const newColumn = {id: newColumnId, title: newColumnId, taskIds: []};
 
@@ -250,8 +200,6 @@ const Board = () => {;
                     const tasks = column.taskIds.map(
                       taskId => boardState.tasks[taskId]
                     );
-                      // console.log(`tasks man = `, tasks);
-                      // console.log(`board state man = `, boardState);
                       const isDropDisabled = false;  //index < boardState.homeIndex; //disable going backwards
                       return <Column key={column.id} column={column} tasks={tasks} isDropDisabled={isDropDisabled} index={index} boardState={boardState} setBoardState={setBoardState}/>
                     })
@@ -278,6 +226,8 @@ const Board = () => {;
 
 const BoardArea = styled.div`
   display: flex;
+  /*removed because board area is actually flush with tallest column. Consider transparent board background
+  to display a background image*/
   /* background-image: url(${BoardImage});
   background-position: center;
   background-repeat: no-repeat;
@@ -318,8 +268,6 @@ const LoaderDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 100%;
-  height: 100%; */
   animation: ${rotate} infinite 4s linear;
 `;
 
@@ -342,15 +290,11 @@ const SelectBoard = styled.select`
 `;
 
 const EditButton = styled.div`
-  /* position:absolute; 
-  top:-6px;
-  left:95%; */
   color:black;
   width:15px;
   border:none; 
   background-color:inherit;
   margin-left: 20px;
-  /* display:none; */
   &:hover{
     cursor: pointer;
   }
@@ -362,7 +306,6 @@ const BoardRenameDiv = styled.div`
 const BoardRenameInput = styled.input`
   width: 200px;
   height: 24px;
-  /* display: none; */
   padding-left: 5px;
 `;
 

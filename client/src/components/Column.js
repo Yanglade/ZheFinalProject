@@ -14,16 +14,6 @@ const close = () => setShowDialog(false);
 const addTaskBtnRef = useRef();
 const columnNameRef = useRef();
 
-console.log(`Column: ${column.id} = `, tasks);
-
-  // const InnerList = ({tasks}) => {
-  //   return (
-  //     tasks.map((task, index) => <Task key={task.id} task={task} index={index} />)
-  //   )
-  // }
-
-  // const MemoInnerList = memo(InnerList);
-
   const allTasksAreNamed = () => {
     return !tasks.some(aTask => (aTask == undefined || aTask.named == undefined || !aTask.named));
   }
@@ -31,15 +21,9 @@ console.log(`Column: ${column.id} = `, tasks);
 
 
   const addTask = async() => {
-    console.log("in add task");
     const newTaskId = `task-${Object.keys(boardState.tasks).length+1}`;
     const newTask = {id: newTaskId, content: newTaskId, details:{image_url: "../../client/public/favicon.ico"}};
     addTaskBtnRef.current.disabled = true;
-    // const newContent = `<div><img src='../../puclic/favicon.ico'/><label>${newTaskId}</label> </div>`;
-    // const newTask = {id: newTaskId, content: newContent};
-
-
-    //open();
 
     const newBoardState = {...boardState, tasks: {...boardState.tasks, [newTaskId]: newTask }, columns: {...boardState.columns, [column.id]: {...column, taskIds: [...column.taskIds, newTaskId]}}};
 
@@ -53,10 +37,7 @@ console.log(`Column: ${column.id} = `, tasks);
   }
 
   const onEnter = async (e) => {
-    // e.preventDefault();
     e.stopPropagation();
-    // alert(`e.target.value:${e.target.value === ""}...`);
-    //console.log(`e.target.value = `, e.target.value);
     if (e.charCode === 13 && e.target.value !== "") {
       const newBoardState = {...boardState, columns:{...boardState.columns, [column.id]: {...column, named: true, title: e.target.value}}};
       setBoardState(newBoardState);
@@ -73,7 +54,6 @@ console.log(`Column: ${column.id} = `, tasks);
      delete boardState.columns[column.id];
 
      newBoardState.columnOrder = newBoardState.columnOrder.filter(aColumn => aColumn != column.id); //aTask != task.id
-     console.log(`boardState = `, newBoardState);
      setBoardState(newBoardState);
      await actions.updateBoard(newBoardState, userState);
   }
@@ -103,22 +83,19 @@ console.log(`Column: ${column.id} = `, tasks);
             </form>
           ) : (
          <>
-          <Title style={{/*border:"2px solid blue"*/}} {...provided.dragHandleProps}> {column.title}</Title>
+          <Title {...provided.dragHandleProps}> {column.title}</Title>
           <Droppable 
             droppableId={column.id} 
-            // type={column.id === 'column-3' ? 'done': 'active'}
             type="task"
             isDropDisabled={isDropDisabled}
             
           >
             {(provided, snapshot) => (
               <TaskList
-                // innerRef={provided.innerRef}
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 isDraggingOver = {snapshot.isDraggingOver}
               > 
-                   {/* {((tasks !== undefined) && (tasks != {}) && (tasks !== []) && (tasks.length > 0)) && tasks.map((task, index) => task && <Task key={task.id} task={task} index={index} setBoardState={setBoardState} boardState={boardState} column={column} focusAddTask={focusAddTask}/>)}  */}
                    {tasks.map((task, index) => task && <Task key={task.id} task={task} index={index} setBoardState={setBoardState} boardState={boardState} column={column} focusAddTask={focusAddTask}/>)} 
                   {/* <MemoInnerList tasks={tasks}/> */}
                   {/* <div>{tasks.length}</div> */}
@@ -128,30 +105,6 @@ console.log(`Column: ${column.id} = `, tasks);
           </Droppable>
           <div style={{alignSelf:"center", width:"100px"}}>
             <AddTaskButton onClick={addTask} ref={addTaskBtnRef} disabled={!allTasksAreNamed()}>Add a task</AddTaskButton>
-            {/* <DialogOverlay
-              style={{ background: "hsla(0, 100%, 100%, 0.5)", width: "80vw" }}
-              isOpen={showDialog}
-              onDismiss={close}
-            >
-              <DialogContent
-                aria-label="Adding a task"
-                style={{ boxShadow: "0px 10px 50px hsla(0, 0%, 0%, 0.33)",
-                        border: "solid 3px hsla(0, 0%, 0%, 0.5)", 
-                        borderRadius: "10px",
-                        width: "20vw"
-                      }}
-              >
-                <p>
-                  The overlay styles are a white fade instead of the default black
-                  fade.
-                </p>
-                <form>
-                  <input placeholder="Task Name" type="text" name="taskName" required/>
-                </form>
-
-                <button style={{margin:"10px 0px"}} onClick={close}>Close</button>
-              </DialogContent>
-            </DialogOverlay> */}
           </div>
         </>
        )}
@@ -173,7 +126,6 @@ const Container = styled.div`
   width: 220px;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
 `;
 
 const Title = styled.h3`

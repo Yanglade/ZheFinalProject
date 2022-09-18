@@ -15,7 +15,6 @@ const reducer = (userState, action) => {
     }
 
     case 'set-user': {
-      console.log(`action = `, action)
       return {
         email: action.email,
         picture: action.picture,
@@ -72,14 +71,6 @@ const UserProvider = ({children}) => {
   };
 
   const createUserAndReceiveInfo = async (user) => {
-
-    //POST fetch call
-    // const body = {
-    //   email: user.email,
-    //   name: user.name,
-    //   picture: user.picture
-    // }
-
     let userId;
     let preAction;
 
@@ -94,18 +85,13 @@ const UserProvider = ({children}) => {
       })
     }
 
-    console.log(`Create and receive info postOptions = `, postOptions);
-
     try {
-
       const res = await fetch("/api/add-user", postOptions)
       const json = await res.json();
       
         const {status} = json;
-        // console.log(`status = `, status);
         if (status === 200) {
           const {data} = json;
-          console.log(`UserContext_data = `, data);
 
           //const action
            preAction= {
@@ -120,8 +106,6 @@ const UserProvider = ({children}) => {
           }
 
           userId = data._id;
-      
-          // dispatch(action);
 
         }
       }
@@ -150,20 +134,6 @@ const UserProvider = ({children}) => {
     catch(err) {
       console.error("Error while fetching boards for the user", err.message);
     }
-
-    //Existing User, send back the user object from the database
-    //User does not exist, create an ew user and send back the user object from the database
-/*
-    const action = {
-      type: "set-user",
-      email: user.email,
-      given_name: user.given_name,
-      family_name: user.family_name,
-      picture: user.picture
-    }
-
-    dispatch(action);
-    */
   };
 
   const updateBoard = async (board, aUserState) => {
@@ -179,20 +149,14 @@ const UserProvider = ({children}) => {
       })
     }
 
-    console.log(`updateBoard...postOptions = `, postOptions);
-
     try {
 
       const res = await fetch("/api/update-board", postOptions)
       const json = await res.json();
-
-      console.log(`json from updateBoard = `,json);
       
       const {status} = json;
-      // console.log(`status = `, status);
       if (status === 200) {
         const {board} = json;
-        console.log(`UserContext_updatedBoard = `, board);
 
         const newBoardsForUser = aUserState.boardsForUser.map(aboard => {
           if (aboard._id === board._id) {
@@ -203,8 +167,6 @@ const UserProvider = ({children}) => {
           }
         })
 
-        console.log(`newBoardsForUser--after rename = `, newBoardsForUser);
-
         const action = {
           type: "update-board",
           ...aUserState,
@@ -214,9 +176,6 @@ const UserProvider = ({children}) => {
         dispatch(action);
 
       }
-      // else if (status === 304) {
-      //   console.log("caught in 304...................");
-      // }
     }
     catch(err) {
       console.error(err.message);

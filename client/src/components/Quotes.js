@@ -8,13 +8,9 @@ const Quotes = () => {
   const [loading, setLoading] = useState();
 
   const getQuote = async () => {
-    // const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    // const res = await fetch(proxyurl + "https://zenquotes.io/api/random/3");
     const res = await fetch("/zen");
     const json = await res.json();
-    console.log({json})
     const {data} = json;
-    console.log(`data = `, data[0]);
     setQuote(data[0]);
   }
 
@@ -23,8 +19,6 @@ const Quotes = () => {
     await getQuote();
     if (quote)
       setLoading(false);
-
-    console.log(`quote = `, quote);
   }, []) //[quote]
 
   return (
@@ -83,8 +77,6 @@ const LoaderDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* width: 100%;
-  height: 100%; */
   animation: ${rotate} infinite 4s linear;
 `;
 

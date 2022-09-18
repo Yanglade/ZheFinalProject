@@ -13,8 +13,6 @@ const Dashboard = ({logout}) => {
   const [loading, setLoading] = useState(true);
   const {userState} = useContext(UserContext);
 
-  console.log(`state in Dashboard = `, userState);
-
   useEffect(()=> {
     if (userState !== undefined) 
       setLoading(false);
